@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>랜딩 에디터 — MEDICALO</title>
+<title>랜딩 에디터 — MEDICAL O</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { height:100%; }
   body {
-    font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif;
+    font-family:'Helvetica Neue',Pretendard,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;
     font-size:14px; color:#1f2937; background:#eceef1;
     display:flex; flex-direction:column; overflow:hidden;
     letter-spacing:-.01em; -webkit-font-smoothing:antialiased;
@@ -36,6 +36,7 @@
   .tbtn.dark { background:#111827; color:#fff; border-color:#111827; }
   .tbtn.dark:hover { background:#000; }
   .tbtn.dark.dirty { background:#2563eb; border-color:#2563eb; }
+  .tbtn:disabled { opacity:.35; cursor:default; }
 
   /* ---------- Layout ---------- */
   .main { flex:1; display:flex; min-height:0; }
@@ -52,6 +53,7 @@
     padding:4px 10px; font-size:12px; color:#4b5563;
   }
   .wbtn.on { background:#111827; color:#fff; border-color:#111827; }
+  .wbtn:disabled { opacity:.35; cursor:default; }
   .dirty-note { color:#d97706; font-weight:600; }
   .stage-body { flex:1; overflow:auto; display:flex; justify-content:center; padding:20px 24px 28px; }
   .frame-wrap { height:100%; transition:width .25s ease; width:440px; max-width:100%; }
@@ -67,6 +69,12 @@
     background:#f7f8fa; border-left:1px solid #e5e7eb;
     overflow-y:auto; padding:14px 14px 60px;
   }
+  .guide {
+    background:#eef4ff; border:1px solid #d6e4ff; color:#1e40af;
+    border-radius:10px; padding:11px 14px; font-size:12.5px; line-height:1.65;
+    margin-bottom:12px;
+  }
+  .guide b { font-weight:700; }
   .g { margin-bottom:10px; }
   .g-head {
     background:#fff; border:1px solid #e5e7eb; border-radius:10px;
@@ -99,7 +107,7 @@
   .blk.open { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.12); }
   .b-head { display:flex; align-items:center; gap:8px; padding:8px 10px; cursor:pointer; user-select:none; }
   .b-head:hover { background:#fafbfc; }
-  .drag { color:#d1d5db; font-size:11px; letter-spacing:-2px; cursor:grab; }
+  .drag { color:#d1d5db; font-size:11px; letter-spacing:-2px; }
   .bicon {
     width:26px; height:26px; flex:none; border-radius:6px; background:#f3f4f6; color:#374151;
     display:inline-flex; align-items:center; justify-content:center;
@@ -115,7 +123,7 @@
   .fld { margin-bottom:12px; }
   .fld > label {
     display:block; font-size:11px; font-weight:700; letter-spacing:.04em;
-    color:#b91c1c; margin-bottom:6px; text-transform:uppercase;
+    color:#6b7280; margin-bottom:6px;
   }
   .fld textarea {
     width:100%; border:1px solid #d1d5db; border-radius:8px; padding:9px 11px;
@@ -132,10 +140,10 @@
     font-size:12px; font-family:ui-monospace,monospace;
   }
   .filebtn {
-    border:1px solid #d1d5db; background:#fff; border-radius:8px; padding:8px 12px;
-    font-size:12px; color:#374151; cursor:pointer; flex:none;
+    border:1px solid #3b82f6; background:#eff6ff; border-radius:8px; padding:8px 12px;
+    font-size:12px; color:#1d4ed8; font-weight:600; cursor:pointer; flex:none;
   }
-  .filebtn:hover { background:#f3f4f6; }
+  .filebtn:hover { background:#dbeafe; }
   .ed-foot { display:flex; align-items:center; margin-top:4px; }
   .hint { font-size:11.5px; color:#9ca3af; flex:1; }
   .apply {
@@ -174,6 +182,8 @@
     <div class="stage">
       <div class="stage-bar">
         <span id="stageLabel">미리보기 (저장됨)</span>
+        <button class="wbtn" id="btnUndo" title="되돌리기 (Ctrl+Z)" disabled>↺ 되돌리기</button>
+        <button class="wbtn" id="btnRedo" title="다시실행 (Ctrl+Shift+Z)" disabled>↻ 다시실행</button>
         <div class="sp"></div>
         <button class="wbtn" data-w="390">📱 모바일 390</button>
         <button class="wbtn on" data-w="440">📱 모바일 440</button>
@@ -203,12 +213,21 @@
   var panel = document.getElementById('panel');
   var stageLabel = document.getElementById('stageLabel');
   var btnSave = document.getElementById('btnSave');
+  var btnUndo = document.getElementById('btnUndo');
+  var btnRedo = document.getElementById('btnRedo');
 
   var TREE = [];
-  var collapsed = {};      // groupId -> true
-  var expanded = null;     // 열린 블록 id
+  var collapsed = {};
+  var expanded = null;
   var dirty = false;
   var pendingDownload = false;
+
+  // 실행취소/다시실행 — 상태 스냅샷 스택 (top = 현재 상태)
+  var undoStack = [], redoStack = [];
+  var restoring = false;      // restore 로 인한 tree 수신 시 히스토리 push 방지
+  var expectHist = false;     // 블록 이동/복제/삭제 후 스냅샷 요청 플래그
+  var histInit = false;
+  var inlineTimer = null, inlineHistTimer = null;
 
   /* ---------- helpers ---------- */
   function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -220,18 +239,23 @@
   function toast(t) {
     var el = document.getElementById('toast');
     el.textContent = t; el.classList.add('on');
-    clearTimeout(el._t); el._t = setTimeout(function(){ el.classList.remove('on'); }, 1800);
+    clearTimeout(el._t); el._t = setTimeout(function(){ el.classList.remove('on'); }, 2200);
   }
   function setDirty(d) {
     dirty = d;
-    stageLabel.innerHTML = d ? '미리보기 <span class="dirty-note">(저장 전 상태)</span>' : '미리보기 (저장됨)';
+    stageLabel.innerHTML = d ? '미리보기 <span class="dirty-note">(저장 전 — 상단 [저장]을 눌러주세요)</span>' : '미리보기 (저장됨)';
     btnSave.classList.toggle('dirty', d);
   }
+  function updateHistBtns() {
+    btnUndo.disabled = undoStack.length < 2;
+    btnRedo.disabled = redoStack.length < 1;
+  }
+  function pushHist() { req('state', { tag: 'hist' }); }
   function snip(b) {
     var f = b.fields && b.fields[0];
     if (!f) return '';
     if (f.kind === 'image') {
-      if (/^data:/.test(f.value)) return '업로드 이미지';
+      if (/^data:/.test(f.value)) return '업로드 사진';
       return (f.value.split('/').pop() || '').slice(0, 24);
     }
     return f.value.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().slice(0, 22);
@@ -246,8 +270,8 @@
   /* ---------- render ---------- */
   function ctlBtns(id, group) {
     return '<span class="ctrl">' +
-      '<button class="ic" data-act="up" data-id="' + escAttr(id) + '" data-group="' + group + '" title="위로">↑</button>' +
-      '<button class="ic" data-act="down" data-id="' + escAttr(id) + '" data-group="' + group + '" title="아래로">↓</button>' +
+      '<button class="ic" data-act="up" data-id="' + escAttr(id) + '" data-group="' + group + '" title="위로 이동">↑</button>' +
+      '<button class="ic" data-act="down" data-id="' + escAttr(id) + '" data-group="' + group + '" title="아래로 이동">↓</button>' +
       '<button class="pill" data-act="dup" data-id="' + escAttr(id) + '" data-group="' + group + '">복제</button>' +
       '<button class="pill danger" data-act="del" data-id="' + escAttr(id) + '" data-group="' + group + '">삭제</button>' +
       '</span>';
@@ -259,6 +283,7 @@
     }
     return '<span class="bicon">' + (b.fields.length > 1 ? '▦' : 'T') + '</span>';
   }
+  function typeName(b) { return b.type === '이미지' ? '사진' : (b.fields.length > 1 ? '구성' : '텍스트'); }
   function editorHtml(b) {
     var h = '<div class="b-editor">';
     b.fields.forEach(function (f) {
@@ -266,8 +291,8 @@
       if (f.kind === 'image') {
         h += '<div class="imgrow">' +
           '<img class="ithumb" src="' + escAttr(f.value) + '" onerror="this.style.visibility=\'hidden\'">' +
-          '<input type="text" class="fin" data-fid="' + escAttr(f.fid) + '" data-kind="image" value="' + escAttr(f.value) + '" placeholder="이미지 URL 또는 경로">' +
-          '<label class="filebtn">파일 선택<input type="file" accept="image/*" data-fid="' + escAttr(f.fid) + '" hidden></label>' +
+          '<input type="text" class="fin" data-fid="' + escAttr(f.fid) + '" data-kind="image" value="' + escAttr(f.value) + '" placeholder="이미지 주소(URL) 입력 또는 오른쪽에서 파일 선택">' +
+          '<label class="filebtn">📷 사진 바꾸기<input type="file" accept="image/*" data-fid="' + escAttr(f.fid) + '" hidden></label>' +
           '</div>';
       } else {
         var rows = Math.min(7, Math.max(2, Math.ceil(f.value.length / 42)));
@@ -275,19 +300,21 @@
       }
       h += '</div>';
     });
-    h += '<div class="ed-foot"><span class="hint">HTML 사용 가능 — &lt;br&gt;, &lt;b&gt;, &lt;em&gt; 등</span>' +
+    h += '<div class="ed-foot"><span class="hint">줄바꿈은 &lt;br&gt;, 굵게는 &lt;b&gt;굵게&lt;/b&gt;</span>' +
          '<button class="apply" data-act="apply">적용</button></div></div>';
     return h;
   }
   function render() {
-    if (!TREE.length) { panel.innerHTML = '<div style="color:#9ca3af;padding:30px;text-align:center">블록이 없습니다.</div>'; return; }
-    var h = '';
+    var h = '<div class="guide">💡 <b>왼쪽 미리보기의 글자를 클릭하면 바로 고칠 수 있어요.</b><br>' +
+      '사진은 아래 목록에서 [📷 사진 바꾸기], 순서는 ↑↓, 실수했다면 [↺ 되돌리기].<br>' +
+      '수정을 마치면 꼭 상단의 <b>[저장]</b>을 눌러주세요.</div>';
+    if (!TREE.length) { panel.innerHTML = h + '<div style="color:#9ca3af;padding:30px;text-align:center">블록이 없습니다.</div>'; return; }
     TREE.forEach(function (g, gi) {
       var col = collapsed[g.id];
       h += '<div class="g"><div class="g-head">' +
         '<button class="tgl" data-act="collapse" data-id="' + escAttr(g.id) + '">' + (col ? '▶' : '▼') + '</button>' +
         '<span class="ficon">▣</span>' +
-        '<span class="g-title"><span class="no">' + (gi + 1) + '</span> 그룹 ' + esc(g.label) +
+        '<span class="g-title"><span class="no">' + (gi + 1) + '</span> ' + esc(g.label) +
         ' <span class="cnt">· ' + g.blocks.length + '개</span></span>' +
         ctlBtns(g.id, true) + '</div>';
       if (!col) {
@@ -298,7 +325,7 @@
             '<div class="b-head" data-act="expand" data-id="' + escAttr(b.id) + '">' +
             '<span class="drag">⋮⋮</span>' + iconOf(b) +
             '<span class="b-title"><span class="no">' + (gi + 1) + '.' + (bi + 1) + '</span> ' +
-            esc(b.type) + ' <span class="lbl">' + esc(b.label) + '</span>' +
+            esc(typeName(b)) + ' <span class="lbl">' + esc(b.label) + '</span>' +
             (snip(b) ? ' <span class="snip">· ' + esc(snip(b)) + '</span>' : '') +
             '</span>' + ctlBtns(b.id, false) + '</div>' +
             (open ? editorHtml(b) : '') +
@@ -327,18 +354,18 @@
       var ed = btn.closest('.b-editor');
       ed.querySelectorAll('.fin').forEach(function (inp) {
         req('update', { fid: inp.dataset.fid, kind: inp.dataset.kind, value: inp.value });
-        // 로컬 트리 값 갱신
         TREE.forEach(function (g) { g.blocks.forEach(function (b) {
           b.fields.forEach(function (f) { if (f.fid === inp.dataset.fid) f.value = inp.value; });
         }); });
       });
-      setDirty(true); render(); toast('적용됨 — 저장을 눌러야 유지됩니다');
+      setDirty(true); pushHist(); render(); toast('적용됐어요 — [저장]을 눌러야 유지됩니다');
     } else if (act === 'up' || act === 'down' || act === 'dup' || act === 'del') {
       if (act === 'del') {
-        var target = isG ? '그룹' : '블록';
-        if (!confirm('이 ' + target + '을(를) 삭제할까요?')) return;
+        var target = isG ? '이 묶음 전체를' : '이 블록을';
+        if (!confirm(target + ' 삭제할까요?\n(실수해도 [↺ 되돌리기]로 복구할 수 있어요)')) return;
         if (expanded === id) expanded = null;
       }
+      expectHist = true;
       req('op', { action: act, id: id, group: isG });
       setDirty(true);
     }
@@ -355,7 +382,7 @@
       var th = row.querySelector('.ithumb');
       inp.value = reader.result;
       th.src = reader.result; th.style.visibility = 'visible';
-      toast('파일이 로드됐습니다 — [적용]을 눌러 반영하세요');
+      toast('사진을 불러왔어요 — [적용]을 누르면 미리보기에 반영됩니다');
     };
     reader.readAsDataURL(f.files[0]);
   });
@@ -385,9 +412,22 @@
         TREE = m.tree || [];
         if (expanded && !findBlock(expanded)) expanded = null;
         render();
+        if (m.cause === 'restore' && restoring) { restoring = false; break; }
+        if (!histInit) { histInit = true; pushHist(); }
+        else if (expectHist) { expectHist = false; pushHist(); }
+        break;
+      case 'inline':
+        // 미리보기 직접 편집 동기화
+        TREE.forEach(function (g) { g.blocks.forEach(function (b) {
+          b.fields.forEach(function (f) { if (f.fid === m.fid) f.value = m.value; });
+        }); });
+        setDirty(true);
+        clearTimeout(inlineTimer); inlineTimer = setTimeout(render, 700);
+        clearTimeout(inlineHistTimer); inlineHistTimer = setTimeout(pushHist, 1200);
         break;
       case 'picked':
         if (!m.group) {
+          if (expanded === m.id) break;
           expanded = m.id;
           var loc = findBlock(m.id);
           if (loc) collapsed[loc.g.id] = false;
@@ -397,11 +437,21 @@
         }
         break;
       case 'state':
-        try {
-          localStorage.setItem(KEY, JSON.stringify(m.state));
-          setDirty(false); toast('저장 완료');
-        } catch (err) {
-          toast('저장 실패 — 용량 초과일 수 있습니다 (이미지 URL 사용 권장)');
+        if (m.tag === 'hist') {
+          var json = JSON.stringify(m.state);
+          if (undoStack[undoStack.length - 1] !== json) {
+            undoStack.push(json);
+            if (undoStack.length > 60) undoStack.shift();
+            redoStack = [];
+          }
+          updateHistBtns();
+        } else {
+          try {
+            localStorage.setItem(KEY, JSON.stringify(m.state));
+            setDirty(false); toast('저장 완료 ✓');
+          } catch (err) {
+            toast('저장 실패 — 업로드한 사진 용량이 너무 클 수 있어요');
+          }
         }
         break;
       case 'html':
@@ -419,14 +469,34 @@
     }
   });
 
+  /* ---------- 실행취소 / 다시실행 ---------- */
+  function undo() {
+    if (undoStack.length < 2) return;
+    redoStack.push(undoStack.pop());
+    restoring = true;
+    req('restore', { state: JSON.parse(undoStack[undoStack.length - 1]) });
+    setDirty(true); updateHistBtns();
+  }
+  function redo() {
+    if (!redoStack.length) return;
+    var s = redoStack.pop();
+    undoStack.push(s);
+    restoring = true;
+    req('restore', { state: JSON.parse(s) });
+    setDirty(true); updateHistBtns();
+  }
+  btnUndo.addEventListener('click', undo);
+  btnRedo.addEventListener('click', redo);
+
   /* ---------- topbar ---------- */
   document.getElementById('btnSave').addEventListener('click', function () { req('state'); });
   document.getElementById('btnView').addEventListener('click', function () { window.open('index.html'); });
   document.getElementById('btnExport').addEventListener('click', function () { pendingDownload = true; req('export'); });
   document.getElementById('btnReset').addEventListener('click', function () {
-    if (!confirm('저장된 모든 편집 내용을 초기화할까요? 원본 상태로 돌아갑니다.')) return;
+    if (!confirm('저장된 모든 편집 내용을 지우고 처음 상태로 되돌릴까요?')) return;
     localStorage.removeItem(KEY);
     expanded = null; setDirty(false);
+    undoStack = []; redoStack = []; histInit = false; updateHistBtns();
     frame.contentWindow.location.reload();
     toast('초기화되었습니다');
   });
@@ -447,9 +517,14 @@
     });
   });
 
-  /* ---------- 저장 단축키 ---------- */
+  /* ---------- 단축키 & 이탈 경고 ---------- */
   window.addEventListener('keydown', function (e) {
-    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); req('state'); }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); req('state'); }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
+  });
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
   });
 })();
 </script>

@@ -47,7 +47,10 @@
     '.reveal{opacity:1!important;transform:none!important}',
     'html{scroll-behavior:auto}',
     '[data-lp]:hover{outline:1px dashed rgba(59,130,246,.7);outline-offset:2px;cursor:pointer}',
-    '.lp-sel{outline:2px solid #3b82f6!important;outline-offset:3px;box-shadow:0 0 0 6px rgba(59,130,246,.15);border-radius:2px}'
+    '.lp-sel{outline:2px solid #3b82f6!important;outline-offset:3px;box-shadow:0 0 0 6px rgba(59,130,246,.15);border-radius:2px}',
+    '[contenteditable]{cursor:text}',
+    '[contenteditable]:hover{outline:1px dashed rgba(59,130,246,.7);outline-offset:2px}',
+    '[contenteditable]:focus{outline:2px solid #3b82f6;outline-offset:3px;box-shadow:0 0 0 6px rgba(59,130,246,.12);border-radius:2px}'
   ].join('\n');
   document.head.appendChild(style);
 
@@ -93,6 +96,11 @@
     var counts = {};
     return els.map(function (el) {
       if (!el.dataset.fid) el.dataset.fid = 'f' + (++fidSeq);
+      // 미리보기에서 바로 수정할 수 있게 텍스트 요소는 contenteditable 처리
+      if (el.tagName !== 'IMG' && !el.hasAttribute('contenteditable')) {
+        el.setAttribute('contenteditable', 'true');
+        el.setAttribute('spellcheck', 'false');
+      }
       var base = labelFor(el);
       counts[base] = (counts[base] || 0) + 1;
       var label = base;
@@ -131,16 +139,31 @@
     try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { el.scrollIntoView(); }
   }
 
-  // 미리보기에서 직접 클릭 → 에디터에 알림
+  // 미리보기에서 직접 클릭 → 에디터에 알림 (텍스트는 그대로 편집 진입)
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-lp]');
     var g = b ? null : e.target.closest('[data-lp-group]');
     if (!b && !g) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (b) { select(b.dataset.lp, false); send('picked', { id: b.dataset.lp, group: false }); }
+    e.preventDefault(); // 링크 이동만 막고, 커서/포커스는 그대로 둔다
+    if (b && !e.target.closest('[contenteditable]')) select(b.dataset.lp, false);
+    if (b) { send('picked', { id: b.dataset.lp, group: false }); }
     else { send('picked', { id: g.dataset.lpGroup, group: true }); }
   }, true);
+
+  // 인라인 편집: 입력 즉시 에디터에 동기화
+  document.addEventListener('input', function (e) {
+    var el = e.target.closest ? e.target.closest('[data-fid][contenteditable]') : null;
+    if (!el) return;
+    send('inline', { fid: el.dataset.fid, value: el.innerHTML.trim() });
+  });
+  // Enter 는 줄바꿈(<br>)으로 — 문단 div 삽입 방지
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    var el = e.target.closest ? e.target.closest('[contenteditable]') : null;
+    if (!el) return;
+    e.preventDefault();
+    document.execCommand('insertHTML', false, '<br>');
+  });
 
   /* ---------- 편집 오퍼레이션 ---------- */
   function elOf(id, isGroup) {
@@ -200,6 +223,10 @@
     var c = g.cloneNode(true);
     c.classList.remove('lp-sel');
     qsa('.lp-sel', c).forEach(function (e) { e.classList.remove('lp-sel'); });
+    qsa('[contenteditable]', c).forEach(function (e) {
+      e.removeAttribute('contenteditable');
+      e.removeAttribute('spellcheck');
+    });
     return c;
   }
   function getState() {
@@ -217,6 +244,10 @@
     var st = doc.querySelector('#lp-edit-style');
     if (st) st.remove();
     qsa('.lp-sel', doc).forEach(function (e) { e.classList.remove('lp-sel'); });
+    qsa('[contenteditable]', doc).forEach(function (e) {
+      e.removeAttribute('contenteditable');
+      e.removeAttribute('spellcheck');
+    });
     return '<!DOCTYPE html>\n' + doc.outerHTML;
   }
 
@@ -234,8 +265,8 @@
       case 'select':  select(m.id, !!m.group); break;
       case 'update':  doUpdate(m.fid, m.kind, m.value); break;
       case 'op':      doOp(m.action, m.id, !!m.group); break;
-      case 'restore': applyState(m.state); send('tree', { tree: tree() }); break;
-      case 'state':   send('state', { state: getState() }); break;
+      case 'restore': applyState(m.state); send('tree', { tree: tree(), cause: 'restore' }); break;
+      case 'state':   send('state', { state: getState(), tag: m.tag }); break;
       case 'export':  send('html', { html: exportHtml() }); break;
     }
   });
