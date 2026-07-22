@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  var KEY = 'medicalo_lp_state_v2';
+  var KEY = 'medicalo_lp_state_v3';
   var EDIT = /[?&]edit=1/.test(location.search) || window.__LP_EDIT__ === true;
   var insertRef = document.currentScript; // 그룹 재삽입 기준점 (body 끝 script)
   var dupSeq = 0;
@@ -17,14 +17,18 @@
   /* ---------- 상태 적용 (그룹 outerHTML 교체) ---------- */
   function applyState(st) {
     if (!st || !st.order || !st.groups) return;
-    qsa('[data-lp-group]').forEach(function (e) { e.remove(); });
+    var groups = qsa('[data-lp-group]');
+    // 그룹들의 실제 부모(.page 등) 안에서 교체한다
+    var parent = groups.length ? groups[0].parentNode : (qs('.page') || insertRef.parentNode);
+    var anchor = groups.length ? groups[groups.length - 1].nextSibling : (parent === insertRef.parentNode ? insertRef : null);
+    groups.forEach(function (e) { e.remove(); });
     st.order.forEach(function (gid) {
       var html = st.groups[gid];
       if (!html) return;
       var t = document.createElement('template');
       t.innerHTML = html.trim();
       var el = t.content.firstElementChild;
-      if (el) insertRef.parentNode.insertBefore(el, insertRef);
+      if (el) parent.insertBefore(el, anchor);
     });
   }
 
@@ -55,7 +59,7 @@
   document.head.appendChild(style);
 
   /* ---------- 필드 스캔 ---------- */
-  var SEL = 'h1,h2,h3,h4,h5,p,li,figcaption,img,a,span.tag,span.prog-no,span.badge,span.was,span.now,div.num,div.lbl,div.n,.meta span';
+  var SEL = 'h1,h2,h3,h4,h5,p,li,figcaption,summary,img,a,span.tag,span.prog-no,span.badge,span.was,span.now,div.num,div.lbl,div.n,.meta span';
 
   function isLeaf(el) {
     if (el.tagName === 'IMG') return true;
@@ -73,7 +77,14 @@
     if (c.contains('num')) return '수치';
     if (c.contains('lbl')) return '라벨';
     if (c.contains('n')) return '번호';
-    if (c.contains('btn') || c.contains('nav-cta')) return '버튼';
+    if (c.contains('btn') || c.contains('nav-cta') || c.contains('pill-btn') || c.contains('top-cta')) return '버튼';
+    if (c.contains('ov')) return '오버라인';
+    if (c.contains('nm')) return '이름/라벨';
+    if (c.contains('meta')) return '메타 정보';
+    if (c.contains('lb')) return '배너 라벨';
+    if (c.contains('cap')) return '문구';
+    if (c.contains('ans')) return '답변';
+    if (el.tagName === 'SUMMARY') return '질문';
     switch (el.tagName) {
       case 'H1': case 'H2': case 'H3': case 'H4': case 'H5': return '제목';
       case 'P': return '본문';
@@ -120,6 +131,8 @@
   }
 
   function tree() {
+    // 편집 모드에서는 아코디언(FAQ)을 모두 펼쳐 답변도 수정 가능하게
+    qsa('details').forEach(function (d) { d.open = true; });
     return qsa('[data-lp-group]').map(function (g) {
       return {
         id: g.dataset.lpGroup,
