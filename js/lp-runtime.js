@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  var KEY = 'medicalo_lp_state_v1';
+  var KEY = 'medicalo_lp_state_v2';
   var EDIT = /[?&]edit=1/.test(location.search) || window.__LP_EDIT__ === true;
   var insertRef = document.currentScript; // 그룹 재삽입 기준점 (body 끝 script)
   var dupSeq = 0;
