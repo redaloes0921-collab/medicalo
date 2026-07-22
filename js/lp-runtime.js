@@ -58,7 +58,14 @@
     '#lp-drag-h{position:absolute;z-index:99999;width:28px;height:28px;border-radius:9px;background:#3b82f6;color:#fff;font-size:13px;display:none;align-items:center;justify-content:center;cursor:grab;user-select:none;box-shadow:0 2px 10px rgba(0,0,0,.3);letter-spacing:-2px}',
     '#lp-rad-h{position:absolute;z-index:99999;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #3b82f6;display:none;cursor:nwse-resize;box-shadow:0 1px 6px rgba(0,0,0,.35)}',
     '#lp-rad-lb{position:absolute;z-index:99999;background:#111;color:#fff;font-size:11.5px;padding:4px 10px;border-radius:6px;display:none;font-family:sans-serif;white-space:nowrap;pointer-events:none}',
-    '.lp-dragging{opacity:.45!important;outline:2px dashed #3b82f6!important;outline-offset:2px}'
+    '.lp-dragging{opacity:.45!important;outline:2px dashed #3b82f6!important;outline-offset:2px}',
+    '#lp-sp-h{position:absolute;z-index:99998;display:none;background:#3b82f6;color:#fff;border-radius:999px;font-size:11px;padding:4px 12px;cursor:ns-resize;user-select:none;box-shadow:0 2px 8px rgba(0,0,0,.3);font-family:sans-serif;white-space:nowrap}',
+    '#lp-tb{position:absolute;z-index:100000;display:none;align-items:center;gap:2px;background:#111827;border-radius:10px;padding:5px 7px;box-shadow:0 6px 24px rgba(0,0,0,.35);font-family:sans-serif;white-space:nowrap}',
+    '#lp-tb button{border:0;background:transparent;color:#e5e7eb;min-width:26px;height:26px;border-radius:6px;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}',
+    '#lp-tb button:hover{background:rgba(255,255,255,.16)}',
+    '#lp-tb .sw{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.4);min-width:16px;padding:0;margin:0 2px}',
+    '#lp-tb .sep{display:inline-block;width:1px;height:16px;background:rgba(255,255,255,.22);margin:0 4px}',
+    '#lp-tb #lp-fs{color:#fff;font-size:11.5px;min-width:24px;text-align:center;display:inline-block}'
   ].join('\n');
   document.head.appendChild(style);
 
@@ -195,14 +202,24 @@
   document.body.appendChild(radHandle);
   document.body.appendChild(radLabel);
 
-  var hoverBlock = null, dragging = null, radTarget = null, radDrag = null;
+  var spHandle = document.createElement('div');
+  spHandle.id = 'lp-sp-h'; spHandle.textContent = '↕ 여백'; spHandle.title = '드래그해서 블록 아래 여백 조절';
+  document.body.appendChild(spHandle);
+
+  var hoverBlock = null, dragging = null, radTarget = null, radDrag = null, spDrag = null;
 
   function placeDrag(b) {
-    if (!b || dragging) { if (!dragging) dragHandle.style.display = 'none'; return; }
+    if (!b || dragging) {
+      if (!dragging) { dragHandle.style.display = 'none'; spHandle.style.display = 'none'; }
+      return;
+    }
     var r = b.getBoundingClientRect();
     dragHandle.style.display = 'flex';
     dragHandle.style.left = (r.left + window.scrollX - 10) + 'px';
     dragHandle.style.top = (r.top + window.scrollY - 10) + 'px';
+    spHandle.style.display = 'block';
+    spHandle.style.left = (r.left + window.scrollX + r.width / 2 - 28) + 'px';
+    spHandle.style.top = (r.bottom + window.scrollY - 11) + 'px';
   }
   function placeRad() {
     if (!radTarget || !radTarget.isConnected) { radHandle.style.display = 'none'; radLabel.style.display = 'none'; return; }
@@ -213,13 +230,37 @@
   }
 
   document.addEventListener('mouseover', function (e) {
-    if (dragging || radDrag) return;
-    if (e.target === dragHandle || e.target === radHandle) return;
+    if (dragging || radDrag || spDrag) return;
+    if (e.target === dragHandle || e.target === radHandle || e.target === spHandle) return;
     var b = e.target.closest ? e.target.closest('[data-lp]') : null;
     if (b !== hoverBlock) { hoverBlock = b; placeDrag(b); }
   });
-  window.addEventListener('scroll', function () { placeDrag(hoverBlock); placeRad(); }, true);
-  window.addEventListener('resize', function () { placeDrag(hoverBlock); placeRad(); });
+  window.addEventListener('scroll', function () { placeDrag(hoverBlock); placeRad(); placeTb(); }, true);
+  window.addEventListener('resize', function () { placeDrag(hoverBlock); placeRad(); placeTb(); });
+
+  // ---- 아래 여백 조절 핸들 ----
+  spHandle.addEventListener('pointerdown', function (e) {
+    if (!hoverBlock) return;
+    e.preventDefault(); e.stopPropagation();
+    spDrag = { y: e.clientY, base: parseFloat(getComputedStyle(hoverBlock).marginBottom) || 0, el: hoverBlock };
+    spHandle.setPointerCapture(e.pointerId);
+  });
+  spHandle.addEventListener('pointermove', function (e) {
+    if (!spDrag) return;
+    var mb = Math.round(Math.max(-40, Math.min(320, spDrag.base + (e.clientY - spDrag.y))));
+    spDrag.el.style.marginBottom = mb + 'px';
+    radLabel.textContent = '아래 여백 ' + mb + 'px';
+    radLabel.style.display = 'block';
+    radLabel.style.left = (e.pageX + 14) + 'px';
+    radLabel.style.top = (e.pageY - 30) + 'px';
+    placeDrag(spDrag.el);
+  });
+  spHandle.addEventListener('pointerup', function () {
+    if (!spDrag) return;
+    spDrag = null;
+    radLabel.style.display = 'none';
+    send('styled', {});
+  });
 
   // ---- 블록 드래그 이동 (같은 부모 안에서 순서 변경) ----
   dragHandle.addEventListener('pointerdown', function (e) {
@@ -266,7 +307,8 @@
     return block;
   }
   document.addEventListener('click', function (e) {
-    if (e.target === dragHandle || e.target === radHandle) return;
+    if (e.target === dragHandle || e.target === radHandle || e.target === spHandle) return;
+    if (e.target.closest && e.target.closest('#lp-tb')) return;
     var b = e.target.closest ? e.target.closest('[data-lp]') : null;
     radTarget = b ? pickRadTarget(e, b) : null;
     placeRad();
@@ -302,6 +344,84 @@
     radDrag = null;
     radLabel.style.display = 'none';
     send('styled', {});
+  });
+
+  /* =========================================================
+     텍스트 서식 툴바 (굵게 · 크기 · 색 · 정렬 · 지우기)
+     ========================================================= */
+  var tb = document.createElement('div');
+  tb.id = 'lp-tb';
+  tb.innerHTML =
+    '<button data-c="bold" title="굵게 (선택한 글자)"><b>B</b></button>' +
+    '<span class="sep"></span>' +
+    '<button data-c="small" title="글자 작게">A−</button>' +
+    '<span id="lp-fs">–</span>' +
+    '<button data-c="big" title="글자 크게">A+</button>' +
+    '<span class="sep"></span>' +
+    ['#111111', '#55565a', '#97989c', '#DE3E28', '#ffffff'].map(function (c) {
+      return '<button class="sw" data-color="' + c + '" title="글자색" style="background:' + c + '"></button>';
+    }).join('') +
+    '<span class="sep"></span>' +
+    '<button data-c="al" title="왼쪽 정렬">좌</button>' +
+    '<button data-c="ac" title="가운데 정렬">중</button>' +
+    '<button data-c="ar" title="오른쪽 정렬">우</button>' +
+    '<span class="sep"></span>' +
+    '<button data-c="clear" title="서식 원래대로">지움</button>';
+  document.body.appendChild(tb);
+
+  var activeText = null;
+  function placeTb() {
+    if (!activeText || !activeText.isConnected) { tb.style.display = 'none'; return; }
+    var r = activeText.getBoundingClientRect();
+    tb.style.display = 'flex';
+    var top = r.top + window.scrollY - 46;
+    if (r.top < 66) top = r.bottom + window.scrollY + 12;
+    tb.style.top = top + 'px';
+    tb.style.left = Math.max(6, Math.min(r.left + window.scrollX, window.scrollX + document.documentElement.clientWidth - tb.offsetWidth - 6)) + 'px';
+    var fs = tb.querySelector('#lp-fs');
+    fs.textContent = (parseInt(getComputedStyle(activeText).fontSize) || '–') + '';
+  }
+  document.addEventListener('focusin', function (e) {
+    var el = e.target.closest ? e.target.closest('[data-fid][contenteditable]') : null;
+    if (el) { activeText = el; placeTb(); }
+  });
+  document.addEventListener('focusout', function () {
+    setTimeout(function () {
+      var ae = document.activeElement;
+      if (ae && (tb.contains(ae) || ae === activeText)) return;
+      if (ae && ae.closest && ae.closest('[data-fid][contenteditable]')) return;
+      activeText = null; placeTb();
+    }, 0);
+  });
+  tb.addEventListener('mousedown', function (e) {
+    e.preventDefault(); e.stopPropagation(); // 포커스/선택 유지
+    var btn = e.target.closest('button');
+    if (!btn || !activeText) return;
+    var c = btn.dataset.c, col = btn.dataset.color;
+    if (col) {
+      var s = window.getSelection();
+      if (s && !s.isCollapsed && activeText.contains(s.anchorNode)) {
+        document.execCommand('foreColor', false, col); // input 이벤트로 자동 동기화
+      } else {
+        activeText.style.color = col;
+        send('styled', {});
+      }
+    } else if (c === 'bold') {
+      document.execCommand('bold');
+    } else if (c === 'small' || c === 'big') {
+      var cur = parseFloat(getComputedStyle(activeText).fontSize) || 16;
+      activeText.style.fontSize = Math.max(10, Math.min(72, cur + (c === 'big' ? 1 : -1))) + 'px';
+      send('styled', {});
+    } else if (c === 'al' || c === 'ac' || c === 'ar') {
+      activeText.style.textAlign = c === 'al' ? 'left' : c === 'ac' ? 'center' : 'right';
+      send('styled', {});
+    } else if (c === 'clear') {
+      activeText.style.fontSize = ''; activeText.style.color = ''; activeText.style.textAlign = '';
+      document.execCommand('removeFormat');
+      send('styled', {});
+      send('inline', { fid: activeText.dataset.fid, value: activeText.innerHTML.trim() });
+    }
+    placeTb();
   });
 
   // ---- 이미지 라운드 일괄 적용 ----
