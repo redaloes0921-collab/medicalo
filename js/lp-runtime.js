@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  var KEY = 'medicalo_lp_state_v3';
+  var KEY = 'medicalo_lp_state_v4';
   var EDIT = /[?&]edit=1/.test(location.search) || window.__LP_EDIT__ === true;
   var insertRef = document.currentScript; // 그룹 재삽입 기준점 (body 끝 script)
   var dupSeq = 0;
@@ -54,7 +54,11 @@
     '.lp-sel{outline:2px solid #3b82f6!important;outline-offset:3px;box-shadow:0 0 0 6px rgba(59,130,246,.15);border-radius:2px}',
     '[contenteditable]{cursor:text}',
     '[contenteditable]:hover{outline:1px dashed rgba(59,130,246,.7);outline-offset:2px}',
-    '[contenteditable]:focus{outline:2px solid #3b82f6;outline-offset:3px;box-shadow:0 0 0 6px rgba(59,130,246,.12);border-radius:2px}'
+    '[contenteditable]:focus{outline:2px solid #3b82f6;outline-offset:3px;box-shadow:0 0 0 6px rgba(59,130,246,.12);border-radius:2px}',
+    '#lp-drag-h{position:absolute;z-index:99999;width:28px;height:28px;border-radius:9px;background:#3b82f6;color:#fff;font-size:13px;display:none;align-items:center;justify-content:center;cursor:grab;user-select:none;box-shadow:0 2px 10px rgba(0,0,0,.3);letter-spacing:-2px}',
+    '#lp-rad-h{position:absolute;z-index:99999;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #3b82f6;display:none;cursor:nwse-resize;box-shadow:0 1px 6px rgba(0,0,0,.35)}',
+    '#lp-rad-lb{position:absolute;z-index:99999;background:#111;color:#fff;font-size:11.5px;padding:4px 10px;border-radius:6px;display:none;font-family:sans-serif;white-space:nowrap;pointer-events:none}',
+    '.lp-dragging{opacity:.45!important;outline:2px dashed #3b82f6!important;outline-offset:2px}'
   ].join('\n');
   document.head.appendChild(style);
 
@@ -178,6 +182,136 @@
     document.execCommand('insertHTML', false, '<br>');
   });
 
+  /* =========================================================
+     드래그로 블록 이동 + 코너 라운드 핸들
+     ========================================================= */
+  var dragHandle = document.createElement('div');
+  dragHandle.id = 'lp-drag-h'; dragHandle.textContent = '⠿'; dragHandle.title = '드래그해서 위치 이동';
+  var radHandle = document.createElement('div');
+  radHandle.id = 'lp-rad-h'; radHandle.title = '드래그해서 모서리 둥글기 조절';
+  var radLabel = document.createElement('div');
+  radLabel.id = 'lp-rad-lb';
+  document.body.appendChild(dragHandle);
+  document.body.appendChild(radHandle);
+  document.body.appendChild(radLabel);
+
+  var hoverBlock = null, dragging = null, radTarget = null, radDrag = null;
+
+  function placeDrag(b) {
+    if (!b || dragging) { if (!dragging) dragHandle.style.display = 'none'; return; }
+    var r = b.getBoundingClientRect();
+    dragHandle.style.display = 'flex';
+    dragHandle.style.left = (r.left + window.scrollX - 10) + 'px';
+    dragHandle.style.top = (r.top + window.scrollY - 10) + 'px';
+  }
+  function placeRad() {
+    if (!radTarget || !radTarget.isConnected) { radHandle.style.display = 'none'; radLabel.style.display = 'none'; return; }
+    var r = radTarget.getBoundingClientRect();
+    radHandle.style.display = 'block';
+    radHandle.style.left = (r.right + window.scrollX - 26) + 'px';
+    radHandle.style.top = (r.top + window.scrollY + 8) + 'px';
+  }
+
+  document.addEventListener('mouseover', function (e) {
+    if (dragging || radDrag) return;
+    if (e.target === dragHandle || e.target === radHandle) return;
+    var b = e.target.closest ? e.target.closest('[data-lp]') : null;
+    if (b !== hoverBlock) { hoverBlock = b; placeDrag(b); }
+  });
+  window.addEventListener('scroll', function () { placeDrag(hoverBlock); placeRad(); }, true);
+  window.addEventListener('resize', function () { placeDrag(hoverBlock); placeRad(); });
+
+  // ---- 블록 드래그 이동 (같은 부모 안에서 순서 변경) ----
+  dragHandle.addEventListener('pointerdown', function (e) {
+    if (!hoverBlock) return;
+    e.preventDefault();
+    dragging = hoverBlock;
+    dragging.classList.add('lp-dragging');
+    dragHandle.setPointerCapture(e.pointerId);
+    dragHandle.style.cursor = 'grabbing';
+    dragHandle.style.pointerEvents = 'none'; // elementFromPoint 가 핸들에 걸리지 않게
+  });
+  dragHandle.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    dragHandle.style.left = (e.pageX - 14) + 'px';
+    dragHandle.style.top = (e.pageY - 14) + 'px';
+    var el = document.elementFromPoint(e.clientX, e.clientY);
+    if (!el || !el.closest) return;
+    var s = el.closest('[data-lp]');
+    if (!s || s === dragging || s.parentNode !== dragging.parentNode) return;
+    var cs = getComputedStyle(dragging.parentNode);
+    var horiz = (cs.display.indexOf('flex') > -1 && cs.flexDirection.indexOf('column') === -1) ||
+                (cs.display.indexOf('grid') > -1 && cs.gridTemplateColumns.split(' ').length > 1);
+    var r = s.getBoundingClientRect();
+    var before = horiz ? e.clientX < r.left + r.width / 2 : e.clientY < r.top + r.height / 2;
+    dragging.parentNode.insertBefore(dragging, before ? s : s.nextSibling);
+  });
+  dragHandle.addEventListener('pointerup', function () {
+    if (!dragging) return;
+    dragging.classList.remove('lp-dragging');
+    dragHandle.style.cursor = 'grab';
+    dragHandle.style.pointerEvents = '';
+    var moved = dragging; dragging = null;
+    placeDrag(moved);
+    send('tree', { tree: tree(), cause: 'drag' });
+  });
+
+  // ---- 코너 라운드 핸들 ----
+  function pickRadTarget(e, block) {
+    // 이미지 클릭 → 이미지, 텍스트 클릭 → 그 텍스트 요소, 그 외 → 블록
+    var img = e.target.closest ? e.target.closest('img') : null;
+    if (img && block && block.contains(img)) return img;
+    var f = e.target.closest ? e.target.closest('[data-fid]') : null;
+    if (f && block && block.contains(f)) return f;
+    return block;
+  }
+  document.addEventListener('click', function (e) {
+    if (e.target === dragHandle || e.target === radHandle) return;
+    var b = e.target.closest ? e.target.closest('[data-lp]') : null;
+    radTarget = b ? pickRadTarget(e, b) : null;
+    placeRad();
+  }, true);
+
+  radHandle.addEventListener('pointerdown', function (e) {
+    if (!radTarget) return;
+    e.preventDefault(); e.stopPropagation();
+    var r = radTarget.getBoundingClientRect();
+    radDrag = {
+      x: e.clientX, y: e.clientY,
+      base: parseFloat((radTarget.style.borderRadius || '0').replace('%', '')) || 0,
+      min: Math.max(40, Math.min(r.width, r.height))
+    };
+    radHandle.setPointerCapture(e.pointerId);
+  });
+  radHandle.addEventListener('pointermove', function (e) {
+    if (!radDrag) return;
+    var d = ((e.clientX - radDrag.x) + (e.clientY - radDrag.y)) / 2;
+    var pct = Math.round(Math.max(0, Math.min(50, radDrag.base + (d / radDrag.min) * 100)));
+    radTarget.style.borderRadius = pct ? pct + '%' : '';
+    if (radTarget.tagName !== 'IMG' && radTarget.querySelector && radTarget.querySelector('img')) {
+      radTarget.style.overflow = pct ? 'hidden' : '';
+    }
+    radLabel.textContent = '둥글기 ' + pct + '%';
+    radLabel.style.display = 'block';
+    radLabel.style.left = (e.pageX + 14) + 'px';
+    radLabel.style.top = (e.pageY - 30) + 'px';
+    placeRad();
+  });
+  radHandle.addEventListener('pointerup', function () {
+    if (!radDrag) return;
+    radDrag = null;
+    radLabel.style.display = 'none';
+    send('styled', {});
+  });
+
+  // ---- 이미지 라운드 일괄 적용 ----
+  function radiusAll(v) {
+    qsa('[data-lp-group] img').forEach(function (img) {
+      img.style.borderRadius = v ? v + '%' : '';
+    });
+    send('styled', {});
+  }
+
   /* ---------- 편집 오퍼레이션 ---------- */
   function elOf(id, isGroup) {
     return isGroup ? qs('[data-lp-group="' + id + '"]') : qs('[data-lp="' + id + '"]');
@@ -234,8 +368,8 @@
   /* ---------- 상태 직렬화 ---------- */
   function cleanClone(g) {
     var c = g.cloneNode(true);
-    c.classList.remove('lp-sel');
-    qsa('.lp-sel', c).forEach(function (e) { e.classList.remove('lp-sel'); });
+    c.classList.remove('lp-sel', 'lp-dragging');
+    qsa('.lp-sel, .lp-dragging', c).forEach(function (e) { e.classList.remove('lp-sel', 'lp-dragging'); });
     qsa('[contenteditable]', c).forEach(function (e) {
       e.removeAttribute('contenteditable');
       e.removeAttribute('spellcheck');
@@ -279,6 +413,7 @@
       case 'update':  doUpdate(m.fid, m.kind, m.value); break;
       case 'op':      doOp(m.action, m.id, !!m.group); break;
       case 'restore': applyState(m.state); send('tree', { tree: tree(), cause: 'restore' }); break;
+      case 'radiusAll': radiusAll(m.value); break;
       case 'state':   send('state', { state: getState(), tag: m.tag }); break;
       case 'export':  send('html', { html: exportHtml() }); break;
     }

@@ -54,6 +54,13 @@
   }
   .wbtn.on { background:#111827; color:#fff; border-color:#111827; }
   .wbtn:disabled { opacity:.35; cursor:default; }
+  .radctl {
+    display:inline-flex; align-items:center; gap:7px; margin-left:10px;
+    background:#fff; border:1px solid #d1d5db; border-radius:7px; padding:4px 10px;
+    font-size:12px; color:#4b5563;
+  }
+  .radctl input[type=range] { width:90px; accent-color:#3b82f6; }
+  .radctl b { min-width:32px; color:#111827; }
   .dirty-note { color:#d97706; font-weight:600; }
   .stage-body { flex:1; overflow:auto; display:flex; justify-content:center; padding:20px 24px 28px; }
   .frame-wrap { height:100%; transition:width .25s ease; width:440px; max-width:100%; }
@@ -184,6 +191,11 @@
         <span id="stageLabel">미리보기 (저장됨)</span>
         <button class="wbtn" id="btnUndo" title="되돌리기 (Ctrl+Z)" disabled>↺ 되돌리기</button>
         <button class="wbtn" id="btnRedo" title="다시실행 (Ctrl+Shift+Z)" disabled>↻ 다시실행</button>
+        <span class="radctl" title="모든 이미지의 모서리 둥글기를 한 번에 조절합니다">
+          <span>🖼 둥글기 일괄</span>
+          <input type="range" id="radAll" min="0" max="50" value="0" step="1">
+          <b id="radVal">0%</b>
+        </span>
         <div class="sp"></div>
         <button class="wbtn" data-w="390">📱 모바일 390</button>
         <button class="wbtn on" data-w="440">📱 모바일 440</button>
@@ -208,7 +220,7 @@
 <script>
 (function () {
   'use strict';
-  var KEY = 'medicalo_lp_state_v3';
+  var KEY = 'medicalo_lp_state_v4';
   var frame = document.getElementById('frame');
   var panel = document.getElementById('panel');
   var stageLabel = document.getElementById('stageLabel');
@@ -305,9 +317,10 @@
     return h;
   }
   function render() {
-    var h = '<div class="guide">💡 <b>왼쪽 미리보기의 글자를 클릭하면 바로 고칠 수 있어요.</b><br>' +
-      '사진은 아래 목록에서 [📷 사진 바꾸기], 순서는 ↑↓, 실수했다면 [↺ 되돌리기].<br>' +
-      '수정을 마치면 꼭 상단의 <b>[저장]</b>을 눌러주세요.</div>';
+    var h = '<div class="guide">💡 <b>미리보기의 글자를 클릭하면 바로 고칠 수 있어요.</b><br>' +
+      '블록에 마우스를 올리면 나오는 <b>파란 ⠿ 핸들을 드래그</b>하면 위치가 옮겨집니다.<br>' +
+      '이미지·텍스트를 클릭하면 오른쪽 위 <b>○ 핸들 드래그로 모서리 둥글기</b>를 조절할 수 있어요.<br>' +
+      '실수했다면 [↺ 되돌리기], 수정을 마치면 꼭 상단의 <b>[저장]</b>을 눌러주세요.</div>';
     if (!TREE.length) { panel.innerHTML = h + '<div style="color:#9ca3af;padding:30px;text-align:center">블록이 없습니다.</div>'; return; }
     TREE.forEach(function (g, gi) {
       var col = collapsed[g.id];
@@ -415,6 +428,12 @@
         if (m.cause === 'restore' && restoring) { restoring = false; break; }
         if (!histInit) { histInit = true; pushHist(); }
         else if (expectHist) { expectHist = false; pushHist(); }
+        else if (m.cause === 'drag') { setDirty(true); pushHist(); toast('블록을 이동했어요'); }
+        break;
+      case 'styled':
+        // 라운드 등 스타일 변경
+        setDirty(true);
+        clearTimeout(inlineHistTimer); inlineHistTimer = setTimeout(pushHist, 900);
         break;
       case 'inline':
         // 미리보기 직접 편집 동기화
@@ -504,6 +523,16 @@
     if (dirty && !confirm('저장하지 않은 변경사항이 사라집니다. 새로고침할까요?')) return;
     expanded = null; setDirty(false);
     frame.contentWindow.location.reload();
+  });
+
+  /* ---------- 이미지 라운드 일괄 ---------- */
+  var radAll = document.getElementById('radAll');
+  var radVal = document.getElementById('radVal');
+  var radTimer = null;
+  radAll.addEventListener('input', function () {
+    radVal.textContent = radAll.value + '%';
+    clearTimeout(radTimer);
+    radTimer = setTimeout(function () { req('radiusAll', { value: +radAll.value }); }, 80);
   });
 
   /* ---------- 미리보기 폭 ---------- */
