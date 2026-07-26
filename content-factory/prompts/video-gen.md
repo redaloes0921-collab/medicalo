@@ -16,6 +16,7 @@ movement, shallow depth of field, photorealistic, no text overlay
 | 장면 | 프롬프트 추가분 |
 |------|----------------|
 | 피부 클로즈업 | extreme close-up of clear glowing skin on a Korean woman's cheek, gentle light sweep |
+| 모공/피부결 | macro shot of smooth refined skin texture on cheek and nose area, soft studio light, dermatology detail |
 | 거울 보는 인물 | Korean woman in her 30s looking at her skin in a bright bathroom mirror, slightly concerned expression |
 | 진단 장면 | dermatologist examining skin with diagnostic device, clean clinic room, professional |
 | 클리닉 인테리어 | modern minimal clinic interior slow pan, warm white tones, morning light |

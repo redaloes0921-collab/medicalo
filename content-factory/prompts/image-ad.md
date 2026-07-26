@@ -22,7 +22,8 @@ soft focus, dermatology diagnostic mood, subtle skin-layer diagram aesthetic,
 scientific yet warm
 ```
 
-카피 구조: 문제 제기(색소는 표면이 아니라 뿌리) → 유형 진단 → 프로그램명 + CTA
+카피 구조: 문제 제기(원리 훅 — 예: 모공은 닫는 게 아니라 채우는 것 / 색소는 표면이
+아니라 뿌리) → 유형 진단 (피지형/흉터형/탄력저하형 등) → 프로그램명 + CTA
 
 ## 유형 3 — 시즌 프로모형
 
