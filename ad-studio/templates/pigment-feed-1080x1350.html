@@ -22,13 +22,18 @@
     word-break: keep-all; letter-spacing: -0.01em;
   }
 
-  /* ---------- photo (right, blended) ---------- */
+  /* ---------- photo (right, cropped & blended) ----------
+     베이스 이미지 좌측/상단의 AI 텍스트 잔상을 프레임 밖으로 크롭 */
   .photo {
-    position: absolute; top: 0; right: 0; height: 100%; width: auto;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 26%);
-            mask-image: linear-gradient(to right, transparent 0%, #000 26%);
+    position: absolute; top: 0; right: 0; bottom: 0; width: 620px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 36%);
+            mask-image: linear-gradient(to right, transparent 0%, #000 36%);
   }
-  .photo img { height: 100%; width: auto; display: block; }
+  .photo img {
+    position: absolute; height: 116%; width: auto;
+    top: -110px; right: -140px; display: block;
+  }
   /* 바닥 쪽을 배경과 한 번 더 블렌딩 */
   .floor-blend {
     position: absolute; left: 0; right: 0; bottom: 0; height: 220px;
