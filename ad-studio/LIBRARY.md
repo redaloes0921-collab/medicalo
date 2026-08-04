@@ -7,6 +7,8 @@
 | `56ac52ab-5e83-4c42-b363-14f24582de31` | soul_2 | 색소 캠페인 히어로 — 30대 초 여성 클로즈업, 글로우 스킨, #f6f6f7 배경, 좌측 여백 | 3:4 | 2026-07-26 |
 | `acbacb5f-791d-407b-86f9-9a3e7c7b13ee` | soul_2 | 숏폼 훅 컷 — 손거울로 모공 확인하는 20대 후반 여성, 욕실 아침광 | 9:16 | 2026-07-26 |
 | `d67b9363-0235-4d91-a433-4b2709d742b3` | soul_2 | 숏폼 클로징 컷 — 맑은 피부 클로즈업, 상단 텍스트 여백 | 9:16 | 2026-07-26 |
+| `622450e9-2320-4564-8df9-e578fa02f136` | soul_2 | **리얼스킨 히어로 A** (채택) — 필름룩, 주근깨/색소, 좌측 시선, `assets/img/hero-pigment-real-a.png` | 3:4 | 2026-08-04 |
+| `244ad0ca-263c-47b4-9e11-d5f8d1e6e970` | soul_2 | 리얼스킨 히어로 B (무디 버전, 보관) — `assets/img/hero-pigment-real-b.png` | 3:4 | 2026-08-04 |
 
 ## 완성 소재 (합성 렌더 결과)
 
@@ -21,3 +23,14 @@
    합성 시 인물 영역만 크롭해 쓰는 템플릿 구조가 안전하다.
 자산 파이프라인: 힉스필드 CDN이 차단된 세션에서는 `ad-studio/assets/manifest.txt`에
 "<URL> <경로>"를 추가하고 푸시하면 GitHub Actions(asset-sync)가 레포로 가져온다 → git pull 후 로컬 렌더.
+
+## 리얼스킨(실사) 프롬프트 레시피 — AI 티 제거의 핵심
+
+"flawless glass skin / luminous / ultra retouching" 류 표현이 AI 광택 피부의 원인.
+대신 아래 실사 신호를 조합할 것 (soul_2에서 검증됨, 2026-08-04):
+- `photographed on Hasselblad medium format with Kodak Portra 400 film`
+- `real human skin with visible pores, fine vellus hair, natural micro-imperfections, slightly uneven skin tone`
+- `matte natural finish with no glossy highlight, minimal no-makeup makeup`
+- `subtle film grain, documentary editorial realism, not digitally smoothed, no beauty retouching, no AI-perfect skin`
+- 조명은 스튜디오 대신 `soft diffused window daylight`
+주의: 필름 스캔 테두리가 같이 생성되므로 합성 시 크롭으로 제거할 것.
