@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>처방하기 | 풀뿌리원외탕전실</title>
+  <meta name="description" content="풀뿌리원외탕전실 온라인 조제 의뢰 — 제형 선택, 약재 구성, 조제 옵션까지 한 번에." />
+
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <style>
+    /* =========================================================
+       풀뿌리원외탕전실 — 처방하기 (온라인 조제 의뢰)
+       MEDICAL O Brand Guideline ver2.0 준수
+       ========================================================= */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:      #ffffff;
+      --gray:    #f6f6f7;
+      --ink:     #111111;
+      --soft:    #55565a;
+      --mute:    #97989c;
+      --line:    #e9e9eb;
+      --concept: #2F5D3F;
+      --concept-soft: #eef3ef;
+      --danger:  #c0392b;
+      --max: 1160px;
+      --ease: cubic-bezier(.22,.61,.36,1);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Sandoll GothicNeo1', 'Helvetica Neue', Pretendard,
+                   'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      color: var(--ink); background: var(--gray);
+      font-size: 16px; line-height: 1.6; letter-spacing: -0.01em;
+      word-break: keep-all; -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    button { font: inherit; cursor: pointer; }
+    input, select, textarea { font: inherit; color: var(--ink); }
+    .en { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+    :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+    /* ---------- HEADER ---------- */
+    .header {
+      position: fixed; inset: 0 0 auto 0; z-index: 100;
+      height: 64px; background: rgba(255,255,255,.96);
+      backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
+      display: flex; align-items: center;
+    }
+    .header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .logo { display: inline-flex; align-items: center; gap: 9px; }
+    .logo svg { display: block; height: 26px; width: auto; color: var(--concept); }
+    .logo-text b { font-size: 16.5px; font-weight: 700; }
+    .logo-text span { display: block; font-size: 9.5px; letter-spacing: .22em; color: var(--mute); }
+    .header-right { display: flex; align-items: center; gap: 18px; font-size: 14px; color: var(--soft); }
+    .header-right a:hover { color: var(--ink); }
+    .header-right .tel { font-weight: 700; color: var(--ink); }
+
+    /* ---------- 페이지 헤드 ---------- */
+    .page-head { background: var(--bg); border-bottom: 1px solid var(--line); padding: 118px 0 42px; }
+    .page-head .sec-tag { display: block; margin-bottom: 10px; font-size: 12.5px; font-weight: 600; letter-spacing: .16em; color: var(--concept); text-transform: uppercase; }
+    .page-head h1 { font-size: clamp(24px, 3.4vw, 34px); font-weight: 700; letter-spacing: -0.02em; }
+    .page-head p { margin-top: 10px; color: var(--soft); font-size: 15.5px; max-width: 640px; }
+
+    /* ---------- 스텝 표시 ---------- */
+    .steps { display: flex; gap: 8px; margin-top: 28px; flex-wrap: wrap; }
+    .step-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: var(--mute);
+      border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px;
+      background: #fff;
+    }
+    .step-chip b { font-family: 'Helvetica Neue', sans-serif; font-size: 11.5px; }
+    .step-chip.done { color: var(--concept); border-color: var(--concept); }
+
+    /* ---------- 레이아웃 ---------- */
+    .layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; padding: 36px 0 90px; }
+    .card { background: #fff; border: 1px solid var(--line); padding: 30px; }
+    .card + .card { margin-top: 16px; }
+    .card-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 22px; }
+    .card-head .no { font-family: 'Helvetica Neue', sans-serif; font-size: 13px; font-weight: 600; color: var(--concept); letter-spacing: .1em; }
+    .card-head h2 { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; }
+    .card-head .hint { font-size: 13px; color: var(--mute); margin-left: auto; }
+
+    /* ---------- 제형 선택 ---------- */
+    .form-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .ft-item input { position: absolute; opacity: 0; pointer-events: none; }
+    .ft-item label {
+      display: block; border: 1px solid var(--line); padding: 18px 16px;
+      cursor: pointer; transition: border-color .2s var(--ease), background .2s var(--ease);
+      height: 100%;
+    }
+    .ft-item label:hover { border-color: var(--mute); }
+    .ft-item input:checked + label { border-color: var(--concept); background: var(--concept-soft); }
+    .ft-item .en { display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .12em; color: var(--concept); text-transform: uppercase; }
+    .ft-item b { display: block; margin-top: 6px; font-size: 16px; }
+    .ft-item small { display: block; margin-top: 4px; font-size: 12.5px; color: var(--soft); line-height: 1.5; }
+
+    /* ---------- 약재 구성 ---------- */
+    .preset-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .preset-row label { font-size: 13.5px; font-weight: 600; color: var(--soft); }
+    .preset-row select { flex: 1; min-width: 200px; }
+
+    .herb-search { position: relative; margin-bottom: 6px; }
+    .herb-search input { width: 100%; }
+    .herb-suggest {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 20;
+      background: #fff; border: 1px solid var(--ink); border-top: 0;
+      max-height: 240px; overflow-y: auto; display: none;
+    }
+    .herb-suggest.open { display: block; }
+    .herb-suggest button {
+      display: flex; justify-content: space-between; width: 100%;
+      padding: 10px 14px; background: none; border: 0; text-align: left; font-size: 14.5px;
+    }
+    .herb-suggest button:hover, .herb-suggest button.active { background: var(--concept-soft); }
+    .herb-suggest .cat { color: var(--mute); font-size: 12.5px; }
+    .herb-search .tip { font-size: 12.5px; color: var(--mute); margin-top: 6px; }
+
+    table.herb-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+    .herb-table th {
+      text-align: left; font-size: 12.5px; color: var(--mute); font-weight: 600;
+      border-bottom: 1px solid var(--ink); padding: 8px 6px;
+    }
+    .herb-table td { border-bottom: 1px solid var(--line); padding: 9px 6px; font-size: 14.5px; }
+    .herb-table td.num { text-align: right; }
+    .herb-table input.dose {
+      width: 76px; text-align: right; padding: 6px 8px;
+      border: 1px solid var(--line);
+    }
+    .herb-table input.dose:focus { border-color: var(--ink); outline: none; }
+    .herb-table .del {
+      background: none; border: 0; color: var(--mute); font-size: 16px; padding: 2px 8px;
+    }
+    .herb-table .del:hover { color: var(--danger); }
+    .herb-table tfoot td { font-weight: 700; border-bottom: 0; padding-top: 12px; }
+    .herb-empty { text-align: center; color: var(--mute); font-size: 14px; padding: 26px 0 !important; }
+
+    /* ---------- 입력 공통 ---------- */
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+    .field-grid .full { grid-column: 1 / -1; }
+    .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .field label .req { color: var(--danger); }
+    .field input, .field select, .field textarea, .preset-row select {
+      width: 100%; padding: 11px 13px; border: 1px solid var(--line); background: #fff;
+      font-size: 15px; transition: border-color .2s var(--ease);
+    }
+    .field textarea { min-height: 84px; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus, .preset-row select:focus { border-color: var(--ink); outline: none; }
+    .field .sub { font-size: 12.5px; color: var(--mute); margin-top: 5px; }
+    .radio-row { display: flex; gap: 16px; flex-wrap: wrap; padding: 8px 0 2px; }
+    .radio-row label { display: inline-flex; gap: 7px; align-items: center; font-size: 14.5px; font-weight: 500; cursor: pointer; margin: 0; }
+    .radio-row input { accent-color: var(--concept); width: auto; }
+
+    /* ---------- 요약 사이드바 ---------- */
+    .summary { position: sticky; top: 84px; }
+    .summary .card { padding: 26px; }
+    .summary h2 { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+    .sum-list { display: grid; gap: 9px; font-size: 14px; }
+    .sum-list .row { display: flex; justify-content: space-between; gap: 12px; }
+    .sum-list .row span { color: var(--soft); }
+    .sum-list .row b { text-align: right; }
+    .sum-list .row.total { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 6px; }
+    .sum-list .row.total b { color: var(--concept); font-size: 16px; }
+    .summary .btn-submit {
+      width: 100%; margin-top: 20px; padding: 15px;
+      background: var(--ink); color: #fff; border: 0; border-radius: 999px;
+      font-size: 15px; font-weight: 600; transition: opacity .25s var(--ease);
+    }
+    .summary .btn-submit:hover { opacity: .82; }
+    .summary .btn-reset {
+      width: 100%; margin-top: 8px; padding: 12px;
+      background: none; border: 1px solid var(--line); border-radius: 999px;
+      font-size: 13.5px; color: var(--soft);
+    }
+    .summary .btn-reset:hover { border-color: var(--ink); color: var(--ink); }
+    .summary .note { margin-top: 14px; font-size: 12px; color: var(--mute); line-height: 1.6; }
+
+    /* ---------- 완료 모달 / 의뢰서 ---------- */
+    .modal-back {
+      position: fixed; inset: 0; z-index: 200; background: rgba(17,17,17,.5);
+      display: none; align-items: flex-start; justify-content: center;
+      overflow-y: auto; padding: 48px 16px;
+    }
+    .modal-back.open { display: flex; }
+    .modal { background: #fff; max-width: 640px; width: 100%; padding: 40px; }
+    .modal .ok-badge {
+      display: inline-block; font-size: 12.5px; font-weight: 600; letter-spacing: .1em;
+      color: var(--concept); border: 1px solid var(--concept); border-radius: 999px;
+      padding: 6px 14px; margin-bottom: 16px;
+    }
+    .modal h2 { font-size: 22px; font-weight: 700; }
+    .modal .order-no { margin-top: 6px; font-size: 14px; color: var(--soft); }
+    .modal .order-no b { font-family: 'Helvetica Neue', sans-serif; color: var(--ink); }
+
+    .sheet { margin-top: 24px; border-top: 1px solid var(--ink); }
+    .sheet h3 { font-size: 14px; font-weight: 700; margin: 18px 0 8px; }
+    .sheet table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .sheet th { text-align: left; width: 110px; color: var(--soft); font-weight: 600; padding: 6px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .sheet td { padding: 6px 4px; border-bottom: 1px solid var(--line); }
+    .sheet .herbs td { font-size: 13px; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 26px; }
+    .modal-actions button {
+      flex: 1; padding: 13px; border-radius: 999px; font-size: 14.5px; font-weight: 600;
+      border: 1px solid transparent;
+    }
+    .modal-actions .print { background: var(--ink); color: #fff; border: 0; }
+    .modal-actions .close { background: #fff; border-color: #d5d5d8; }
+    .modal-actions .close:hover { border-color: var(--ink); }
+
+    /* ---------- 반응형 ---------- */
+    @media (max-width: 960px) {
+      .layout { grid-template-columns: 1fr; }
+      .summary { position: static; }
+      .form-type-grid { grid-template-columns: repeat(2, 1fr); }
+      .field-grid { grid-template-columns: 1fr; }
+      .header-right .hours { display: none; }
+    }
+
+    /* ---------- 인쇄 ---------- */
+    @media print {
+      body * { visibility: hidden; }
+      .modal-back, .modal-back * { visibility: visible; }
+      .modal-back { position: static; background: none; padding: 0; }
+      .modal { max-width: none; padding: 0; }
+      .modal-actions { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= HEADER ================= -->
+  <header class="header">
+    <div class="wrap">
+      <a href="index.html" class="logo" aria-label="풀뿌리원외탕전실 홈">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="M16 18 C16 12 12 8 6 8 C6 14 10 18 16 18 Z" fill="currentColor"/>
+          <path d="M16 15 C16 10 20 6 26 6 C26 12 22 16 16 16 Z" fill="currentColor" opacity=".55"/>
+          <path d="M16 18 L16 26 M16 21 L11 26 M16 21 L21 26" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-text">
+          <b>풀뿌리원외탕전실</b>
+          <span class="en">PULPPURI HERBAL DISPENSARY</span>
+        </span>
+      </a>
+      <div class="header-right">
+        <span class="hours">평일 09:00–18:00</span>
+        <a href="tel:0318773988" class="tel en">031-877-3988</a>
+        <a href="index.html">홈으로 ›</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= 페이지 헤드 ================= -->
+  <div class="page-head">
+    <div class="wrap">
+      <span class="sec-tag en">Online Prescription</span>
+      <h1>처방하기 — 온라인 조제 의뢰</h1>
+      <p>제형을 선택하고 약재를 구성하면 조제 의뢰서가 만들어집니다. 접수 후 한약사가 처방을 검토하고 확인 연락을 드립니다.</p>
+      <div class="steps" id="steps">
+        <span class="step-chip" data-step="1"><b class="en">STEP 1</b> 제형 선택</span>
+        <span class="step-chip" data-step="2"><b class="en">STEP 2</b> 약재 구성</span>
+        <span class="step-chip" data-step="3"><b class="en">STEP 3</b> 조제 옵션</span>
+        <span class="step-chip" data-step="4"><b class="en">STEP 4</b> 의뢰 정보</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 본문 ================= -->
+  <main class="wrap layout">
+    <div>
+
+      <!-- STEP 1. 제형 선택 -->
+      <section class="card" id="sec-type">
+        <div class="card-head">
+          <span class="no en">STEP 1</span>
+          <h2>제형 선택</h2>
+          <span class="hint">조제할 제형을 선택하세요</span>
+        </div>
+        <div class="form-type-grid" id="formTypeGrid">
+          <!-- JS 렌더링 -->
+        </div>
+      </section>
+
+      <!-- STEP 2. 약재 구성 -->
+      <section class="card" id="sec-herbs">
+        <div class="card-head">
+          <span class="no en">STEP 2</span>
+          <h2>약재 구성</h2>
+          <span class="hint">1첩 기준 용량(g)으로 입력</span>
+        </div>
+
+        <div class="preset-row">
+          <label for="preset">상용처방 불러오기</label>
+          <select id="preset">
+            <option value="">— 직접 구성 —</option>
+          </select>
+        </div>
+
+        <div class="herb-search">
+          <div class="field">
+            <input type="text" id="herbInput" placeholder="약재명 검색 후 Enter로 추가 (예: 당귀, 황기, 감초…)" autocomplete="off" />
+          </div>
+          <div class="herb-suggest" id="herbSuggest"></div>
+          <p class="tip">목록에 없는 약재는 이름을 입력하고 Enter를 누르면 직접 추가됩니다.</p>
+        </div>
+
+        <table class="herb-table">
+          <thead>
+            <tr>
+              <th style="width:36px">No</th>
+              <th>약재명</th>
+              <th>분류</th>
+              <th style="width:110px; text-align:right">1첩당 (g)</th>
+              <th style="width:44px"></th>
+            </tr>
+          </thead>
+          <tbody id="herbBody">
+            <tr class="empty-row"><td colspan="5" class="herb-empty">위 검색창에서 약재를 추가하거나 상용처방을 불러오세요.</td></tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3">합계 (1첩 기준)</td>
+              <td class="num" id="herbTotal">0 g</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </section>
+
+      <!-- STEP 3. 조제 옵션 -->
+      <section class="card" id="sec-options">
+        <div class="card-head">
+          <span class="no en">STEP 3</span>
+          <h2>조제 옵션</h2>
+          <span class="hint" id="optionHint">탕약 기준 옵션</span>
+        </div>
+        <div class="field-grid" id="optionFields">
+          <!-- JS 렌더링 (제형별) -->
+        </div>
+        <div class="field full" style="margin-top:14px">
+          <label for="special">특별 조제 요청사항</label>
+          <textarea id="special" placeholder="예) 선전/후하 약재 지정, 전탕 시간, 무카페인 포장 표기 등"></textarea>
+        </div>
+      </section>
+
+      <!-- STEP 4. 의뢰 정보 -->
+      <section class="card" id="sec-info">
+        <div class="card-head">
+          <span class="no en">STEP 4</span>
+          <h2>의뢰 정보</h2>
+          <span class="hint">한의원 · 환자 · 수령 정보</span>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <label for="clinic">한의원 · 병원명 <span class="req">*</span></label>
+            <input type="text" id="clinic" placeholder="예) 풀뿌리한의원" />
+          </div>
+          <div class="field">
+            <label for="doctor">처방 원장님 성함 <span class="req">*</span></label>
+            <input type="text" id="doctor" placeholder="예) 홍길동" />
+          </div>
+          <div class="field">
+            <label for="phone">연락처 <span class="req">*</span></label>
+            <input type="tel" id="phone" placeholder="010-0000-0000" />
+          </div>
+          <div class="field">
+            <label for="patient">환자명 <span class="req">*</span></label>
+            <input type="text" id="patient" placeholder="예) 김OO" />
+          </div>
+          <div class="field">
+            <label for="patientAge">환자 나이</label>
+            <input type="number" id="patientAge" min="0" max="120" placeholder="예) 45" />
+          </div>
+          <div class="field">
+            <label>환자 성별</label>
+            <div class="radio-row">
+              <label><input type="radio" name="sex" value="여" checked /> 여</label>
+              <label><input type="radio" name="sex" value="남" /> 남</label>
+            </div>
+          </div>
+          <div class="field full">
+            <label>수령 방법 <span class="req">*</span></label>
+            <div class="radio-row">
+              <label><input type="radio" name="delivery" value="한의원 배송" checked /> 한의원으로 배송</label>
+              <label><input type="radio" name="delivery" value="환자 직배송" /> 환자에게 직배송</label>
+              <label><input type="radio" name="delivery" value="방문 수령" /> 방문 수령</label>
+            </div>
+          </div>
+          <div class="field full">
+            <label for="address">배송지 주소</label>
+            <input type="text" id="address" placeholder="배송 수령 시 입력" />
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 요약 사이드바 -->
+    <aside class="summary">
+      <div class="card">
+        <h2>의뢰 요약</h2>
+        <div class="sum-list" id="sumList">
+          <!-- JS 렌더링 -->
+        </div>
+        <button class="btn-submit" id="btnSubmit">조제 의뢰 접수하기</button>
+        <button class="btn-reset" id="btnReset">전체 초기화</button>
+        <p class="note">
+          접수 후 한약사가 처방 내용을 검토하며, 확인 전화 후 조제가 시작됩니다.
+          조제 관련 문의 : 031-877-3988
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ================= 완료 모달 ================= -->
+  <div class="modal-back" id="modalBack" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <span class="ok-badge">접수 완료</span>
+      <h2 id="modalTitle">조제 의뢰가 접수되었습니다</h2>
+      <p class="order-no">의뢰번호 <b id="orderNo"></b> · 한약사 검토 후 확인 연락을 드립니다.</p>
+      <div class="sheet" id="orderSheet">
+        <!-- JS 렌더링: 의뢰서 -->
+      </div>
+      <div class="modal-actions">
+        <button class="print" onclick="window.print()">의뢰서 인쇄</button>
+        <button class="close" id="btnClose">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================
+       데이터
+       ===================================================== */
+    const FORM_TYPES = [
+      { id: 'tang',    en: 'Decoction',    name: '탕약',            desc: '맞춤 전탕 후 1회분 파우치 포장' },
+      { id: 'hwan',    en: 'Pill',         name: '환제',            desc: '농축환 · 제환 방식 조제' },
+      { id: 'premium', en: 'Premium',      name: '공진단 · 경옥고', desc: '프리미엄 보약 라인' },
+      { id: 'stick',   en: 'Soft Extract', name: '연조엑스 (스틱)', desc: '짜먹는 스틱형 제형' },
+      { id: 'powder',  en: 'Powder',       name: '산제 (가루약)',   desc: '분말화 후 소분 포장' },
+      { id: 'ext',     en: 'External',     name: '외용제',          desc: '스프레이 · 크림 등' },
+    ];
+
+    // 상용 약재 목록 (분류: 보기용)
+    const HERBS = [
+      ['갈근','해표'],['감초','보익'],['강활','해표'],['건강','온리'],['계지','해표'],['계피','온리'],
+      ['고본','해표'],['곽향','방향화습'],['구기자','보익'],['금은화','청열'],['길경','화담'],['당귀','보혈'],
+      ['대추','보익'],['대황','사하'],['도인','활혈'],['독활','거풍습'],['두충','보양'],['마황','해표'],
+      ['맥문동','보음'],['목단피','청열'],['목향','이기'],['반하','화담'],['방풍','해표'],['백복령','이수'],
+      ['백출','보기'],['백작약','보혈'],['백지','해표'],['보골지','보양'],['복분자','수삽'],['부자','온리'],
+      ['비파엽','화담'],['사삼','보음'],['산사','소식'],['산수유','수삽'],['산약','보기'],['산조인','안신'],
+      ['상백피','화담'],['생강','해표'],['석고','청열'],['세신','해표'],['소엽','해표'],['숙지황','보혈'],
+      ['승마','해표'],['시호','해표'],['신곡','소식'],['아교','보혈'],['애엽','지혈'],['어성초','청열'],
+      ['오미자','수삽'],['오수유','온리'],['용안육','보혈'],['우슬','활혈'],['울금','활혈'],['원지','안신'],
+      ['육계','온리'],['육종용','보양'],['인삼','보기'],['인진','이수'],['자완','화담'],['작약','보혈'],
+      ['저령','이수'],['적작약','청열'],['전호','화담'],['진피','이기'],['창출','방향화습'],['천궁','활혈'],
+      ['천마','평간'],['천문동','보음'],['택사','이수'],['토사자','보양'],['파극천','보양'],['패모','화담'],
+      ['포공영','청열'],['하수오','보혈'],['행인','화담'],['향부자','이기'],['현삼','청열'],['형개','해표'],
+      ['홍화','활혈'],['황금','청열'],['황기','보기'],['황련','청열'],['황백','청열'],['후박','방향화습'],
+      ['녹용','보양'],['침향','이기'],['당삼','보기'],['백강잠','평간'],['진주모','평간'],['구감초','보익'],
+    ];
+
+    // 상용처방 프리셋 — [약재명, 1첩당 g]
+    const PRESETS = {
+      '십전대보탕': [['인삼',4],['백출',4],['백복령',4],['감초',4],['숙지황',4],['백작약',4],['천궁',4],['당귀',4],['황기',4],['육계',4]],
+      '쌍화탕':     [['백작약',10],['숙지황',4],['황기',4],['당귀',4],['천궁',4],['계피',3],['감초',3],['생강',3],['대추',2]],
+      '보중익기탕': [['황기',6],['인삼',4],['백출',4],['감초',4],['당귀',2],['진피',2],['승마',1.2],['시호',1.2]],
+      '육미지황탕': [['숙지황',16],['산약',8],['산수유',8],['택사',6],['목단피',6],['백복령',6]],
+      '소청룡탕':   [['마황',6],['백작약',6],['반하',6],['계지',6],['세신',3],['건강',3],['오미자',3],['감초',3]],
+      '갈근탕':     [['갈근',8],['마황',6],['계지',4],['백작약',4],['감초',4],['생강',3],['대추',2]],
+    };
+
+    // 제형별 조제 옵션 정의
+    const OPTION_DEFS = {
+      tang: [
+        { id: 'cheob',  label: '첩수',        type: 'number', value: 20, min: 1, sub: '총 조제 첩수' },
+        { id: 'pack',   label: '팩 수',       type: 'number', value: 30, min: 1, sub: '완성 파우치 개수' },
+        { id: 'volume', label: '팩 용량(cc)', type: 'select', value: '120', options: ['80','100','120','150'] },
+        { id: 'method', label: '전탕 방법',   type: 'select', value: '일반 전탕', options: ['일반 전탕','약한 불 장시간','2회 전탕 합제'] },
+      ],
+      hwan: [
+        { id: 'totalG', label: '총 조제량(g)', type: 'number', value: 300, min: 50 },
+        { id: 'size',   label: '환 크기',      type: 'select', value: '5mm (오자대)', options: ['3mm (녹두대)','5mm (오자대)','8mm (대환)'] },
+        { id: 'pack',   label: '소분 포장',    type: 'select', value: '1일 2회분', options: ['1일 2회분','1일 3회분','통포장'] },
+      ],
+      premium: [
+        { id: 'kind',  label: '품목',   type: 'select', value: '공진단', options: ['공진단','경옥고'] },
+        { id: 'count', label: '수량(환/통)', type: 'number', value: 30, min: 1 },
+        { id: 'grade', label: '원료 등급', type: 'select', value: '기본', options: ['기본','프리미엄(침향 등 상담)'] },
+      ],
+      stick: [
+        { id: 'count',  label: '스틱 수',      type: 'number', value: 30, min: 1 },
+        { id: 'volume', label: '스틱 용량(ml)', type: 'select', value: '15', options: ['10','15','20'] },
+      ],
+      powder: [
+        { id: 'totalG', label: '총 조제량(g)', type: 'number', value: 200, min: 50 },
+        { id: 'pack',   label: '소분 포장',    type: 'select', value: '1회 3g', options: ['1회 2g','1회 3g','1회 5g','통포장'] },
+      ],
+      ext: [
+        { id: 'kind',  label: '외용 제형', type: 'select', value: '스프레이', options: ['스프레이','크림','연고','좌욕팩'] },
+        { id: 'count', label: '용기 수',   type: 'number', value: 5, min: 1 },
+      ],
+    };
+
+    /* =====================================================
+       상태
+       ===================================================== */
+    const state = {
+      formType: 'tang',
+      herbs: [],          // {name, cat, dose}
+      options: {},        // 제형별 옵션 값
+      preset: '',
+    };
+
+    const $ = (sel) => document.querySelector(sel);
+
+    /* =====================================================
+       STEP 1 — 제형 렌더링
+       ===================================================== */
+    function renderFormTypes() {
+      $('#formTypeGrid').innerHTML = FORM_TYPES.map(f => `
+        <div class="ft-item">
+          <input type="radio" name="formType" id="ft-${f.id}" value="${f.id}" ${state.formType === f.id ? 'checked' : ''} />
+          <label for="ft-${f.id}">
+            <span class="en">${f.en}</span>
+            <b>${f.name}</b>
+            <small>${f.desc}</small>
+          </label>
+        </div>
+      `).join('');
+      document.querySelectorAll('input[name="formType"]').forEach(r => {
+        r.addEventListener('change', () => {
+          state.formType = r.value;
+          renderOptions();
+          update();
+        });
+      });
+    }
+
+    /* =====================================================
+       STEP 2 — 약재 검색 / 테이블
+       ===================================================== */
+    const herbInput = $('#herbInput');
+    const suggestBox = $('#herbSuggest');
+    let activeIdx = -1;
+
+    function matchedHerbs(q) {
+      if (!q) return [];
+      return HERBS.filter(([name]) => name.includes(q)).slice(0, 12);
+    }
+
+    function renderSuggest(q) {
+      const list = matchedHerbs(q);
+      activeIdx = -1;
+      if (!list.length) { suggestBox.classList.remove('open'); suggestBox.innerHTML = ''; return; }
+      suggestBox.innerHTML = list.map(([name, cat], i) =>
+        `<button type="button" data-name="${name}" data-cat="${cat}" data-i="${i}">${name}<span class="cat">${cat}</span></button>`
+      ).join('');
+      suggestBox.classList.add('open');
+      suggestBox.querySelectorAll('button').forEach(b => {
+        b.addEventListener('click', () => { addHerb(b.dataset.name, b.dataset.cat); });
+      });
+    }
+
+    function addHerb(name, cat, dose = 4) {
+      name = name.trim();
+      if (!name) return;
+      if (state.herbs.some(h => h.name === name)) {
+        alert('이미 추가된 약재입니다: ' + name);
+      } else {
+        state.herbs.push({ name, cat: cat || '기타', dose });
+      }
+      herbInput.value = '';
+      suggestBox.classList.remove('open');
+      state.preset = ''; $('#preset').value = '';
+      renderHerbTable(); update();
+      herbInput.focus();
+    }
+
+    herbInput.addEventListener('input', () => renderSuggest(herbInput.value.trim()));
+    herbInput.addEventListener('keydown', (e) => {
+      const btns = suggestBox.querySelectorAll('button');
+      if (e.key === 'ArrowDown' && btns.length) {
+        e.preventDefault();
+        activeIdx = (activeIdx + 1) % btns.length;
+        btns.forEach((b, i) => b.classList.toggle('active', i === activeIdx));
+      } else if (e.key === 'ArrowUp' && btns.length) {
+        e.preventDefault();
+        activeIdx = (activeIdx - 1 + btns.length) % btns.length;
+        btns.forEach((b, i) => b.classList.toggle('active', i === activeIdx));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (activeIdx >= 0 && btns[activeIdx]) {
+          addHerb(btns[activeIdx].dataset.name, btns[activeIdx].dataset.cat);
+        } else {
+          const q = herbInput.value.trim();
+          const exact = HERBS.find(([n]) => n === q);
+          if (exact) addHerb(exact[0], exact[1]);
+          else if (q) addHerb(q, '직접입력');
+        }
+      } else if (e.key === 'Escape') {
+        suggestBox.classList.remove('open');
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.herb-search')) suggestBox.classList.remove('open');
+    });
+
+    function renderHerbTable() {
+      const body = $('#herbBody');
+      if (!state.herbs.length) {
+        body.innerHTML = '<tr class="empty-row"><td colspan="5" class="herb-empty">위 검색창에서 약재를 추가하거나 상용처방을 불러오세요.</td></tr>';
+      } else {
+        body.innerHTML = state.herbs.map((h, i) => `
+          <tr>
+            <td class="en">${i + 1}</td>
+            <td><b>${h.name}</b></td>
+            <td style="color:var(--mute); font-size:13px">${h.cat}</td>
+            <td class="num"><input type="number" class="dose" data-i="${i}" value="${h.dose}" min="0.1" step="0.1" /></td>
+            <td><button type="button" class="del" data-i="${i}" aria-label="${h.name} 삭제">×</button></td>
+          </tr>
+        `).join('');
+        body.querySelectorAll('.dose').forEach(inp => {
+          inp.addEventListener('input', () => {
+            state.herbs[+inp.dataset.i].dose = parseFloat(inp.value) || 0;
+            updateHerbTotal(); update();
+          });
+        });
+        body.querySelectorAll('.del').forEach(btn => {
+          btn.addEventListener('click', () => {
+            state.herbs.splice(+btn.dataset.i, 1);
+            renderHerbTable(); update();
+          });
+        });
+      }
+      updateHerbTotal();
+    }
+
+    function herbTotalPerCheob() {
+      return state.herbs.reduce((s, h) => s + (h.dose || 0), 0);
+    }
+    function updateHerbTotal() {
+      $('#herbTotal').textContent = herbTotalPerCheob().toFixed(1).replace(/\.0$/, '') + ' g';
+    }
+
+    // 프리셋
+    function renderPresets() {
+      const sel = $('#preset');
+      sel.innerHTML = '<option value="">— 직접 구성 —</option>' +
+        Object.keys(PRESETS).map(k => `<option value="${k}">${k}</option>`).join('');
+      sel.addEventListener('change', () => {
+        if (!sel.value) return;
+        const catOf = (name) => (HERBS.find(([n]) => n === name) || [null, '기타'])[1];
+        state.herbs = PRESETS[sel.value].map(([name, dose]) => ({ name, cat: catOf(name), dose }));
+        state.preset = sel.value;
+        renderHerbTable(); update();
+      });
+    }
+
+    /* =====================================================
+       STEP 3 — 제형별 옵션
+       ===================================================== */
+    function renderOptions() {
+      const defs = OPTION_DEFS[state.formType];
+      state.options = {};
+      defs.forEach(d => { state.options[d.id] = d.value; });
+      const typeName = FORM_TYPES.find(f => f.id === state.formType).name;
+      $('#optionHint').textContent = typeName + ' 기준 옵션';
+      $('#optionFields').innerHTML = defs.map(d => `
+        <div class="field">
+          <label for="opt-${d.id}">${d.label}</label>
+          ${d.type === 'select'
+            ? `<select id="opt-${d.id}">${d.options.map(o => `<option ${o === String(d.value) ? 'selected' : ''}>${o}</option>`).join('')}</select>`
+            : `<input type="number" id="opt-${d.id}" value="${d.value}" min="${d.min || 0}" />`}
+          ${d.sub ? `<p class="sub">${d.sub}</p>` : ''}
+        </div>
+      `).join('');
+      defs.forEach(d => {
+        $(`#opt-${d.id}`).addEventListener('input', (e) => {
+          state.options[d.id] = e.target.value;
+          update();
+        });
+      });
+    }
+
+    /* =====================================================
+       요약 사이드바 / 스텝 상태
+       ===================================================== */
+    function optionSummaryRows() {
+      const defs = OPTION_DEFS[state.formType];
+      return defs.map(d => {
+        let v = state.options[d.id];
+        return `<div class="row"><span>${d.label}</span><b>${v}</b></div>`;
+      }).join('');
+    }
+
+    function update() {
+      const typeName = FORM_TYPES.find(f => f.id === state.formType).name;
+      const perCheob = herbTotalPerCheob();
+      let totalUse = '';
+      if (state.formType === 'tang') {
+        const cheob = parseFloat(state.options.cheob) || 0;
+        totalUse = `<div class="row total"><span>총 약재 사용량</span><b>${(perCheob * cheob).toFixed(0)} g</b></div>`;
+      }
+      $('#sumList').innerHTML = `
+        <div class="row"><span>제형</span><b>${typeName}</b></div>
+        <div class="row"><span>처방</span><b>${state.preset || '직접 구성'}</b></div>
+        <div class="row"><span>약재 수</span><b>${state.herbs.length}종</b></div>
+        <div class="row"><span>1첩 합계</span><b>${perCheob.toFixed(1).replace(/\.0$/, '')} g</b></div>
+        ${optionSummaryRows()}
+        ${totalUse}
+      `;
+      // 스텝 진행 표시
+      const stepDone = {
+        1: true,
+        2: state.herbs.length > 0,
+        3: true,
+        4: !!($('#clinic').value && $('#doctor').value && $('#phone').value && $('#patient').value),
+      };
+      document.querySelectorAll('.step-chip').forEach(c => {
+        c.classList.toggle('done', !!stepDone[c.dataset.step]);
+      });
+    }
+    ['clinic','doctor','phone','patient'].forEach(id => {
+      document.addEventListener('input', (e) => { if (e.target.id === id) update(); });
+    });
+
+    /* =====================================================
+       제출 / 의뢰서
+       ===================================================== */
+    function validate() {
+      if (!state.herbs.length) { alert('약재를 1개 이상 추가해주세요. (STEP 2)'); return false; }
+      const required = [
+        ['clinic', '한의원 · 병원명'],
+        ['doctor', '처방 원장님 성함'],
+        ['phone', '연락처'],
+        ['patient', '환자명'],
+      ];
+      for (const [id, label] of required) {
+        if (!$('#' + id).value.trim()) {
+          alert(label + '을(를) 입력해주세요. (STEP 4)');
+          $('#' + id).focus();
+          return false;
+        }
+      }
+      const delivery = document.querySelector('input[name="delivery"]:checked').value;
+      if (delivery !== '방문 수령' && !$('#address').value.trim()) {
+        alert('배송 수령 시 배송지 주소를 입력해주세요.');
+        $('#address').focus();
+        return false;
+      }
+      return true;
+    }
+
+    function buildOrder() {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const orderNo = `P${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+      return {
+        orderNo,
+        createdAt: now.toLocaleString('ko-KR'),
+        formType: FORM_TYPES.find(f => f.id === state.formType).name,
+        preset: state.preset || '직접 구성',
+        herbs: state.herbs.map(h => ({ ...h })),
+        perCheob: herbTotalPerCheob(),
+        options: OPTION_DEFS[state.formType].map(d => ({ label: d.label, value: state.options[d.id] })),
+        special: $('#special').value.trim(),
+        clinic: $('#clinic').value.trim(),
+        doctor: $('#doctor').value.trim(),
+        phone: $('#phone').value.trim(),
+        patient: $('#patient').value.trim(),
+        patientAge: $('#patientAge').value,
+        sex: document.querySelector('input[name="sex"]:checked').value,
+        delivery: document.querySelector('input[name="delivery"]:checked').value,
+        address: $('#address').value.trim(),
+      };
+    }
+
+    function renderSheet(o) {
+      $('#orderNo').textContent = o.orderNo;
+      $('#orderSheet').innerHTML = `
+        <h3>의뢰 개요</h3>
+        <table>
+          <tr><th>접수 일시</th><td>${o.createdAt}</td></tr>
+          <tr><th>제형</th><td>${o.formType} (${o.preset})</td></tr>
+          ${o.options.map(x => `<tr><th>${x.label}</th><td>${x.value}</td></tr>`).join('')}
+          ${o.special ? `<tr><th>요청사항</th><td>${o.special}</td></tr>` : ''}
+        </table>
+        <h3>약재 구성 — 1첩 기준 합계 ${o.perCheob.toFixed(1).replace(/\.0$/, '')} g</h3>
+        <table class="herbs">
+          ${o.herbs.map((h, i) => `<tr><th>${i + 1}. ${h.name}</th><td>${h.dose} g <span style="color:var(--mute)">(${h.cat})</span></td></tr>`).join('')}
+        </table>
+        <h3>의뢰 · 수령 정보</h3>
+        <table>
+          <tr><th>한의원</th><td>${o.clinic} (${o.doctor} 원장)</td></tr>
+          <tr><th>연락처</th><td>${o.phone}</td></tr>
+          <tr><th>환자</th><td>${o.patient} · ${o.sex}${o.patientAge ? ' · ' + o.patientAge + '세' : ''}</td></tr>
+          <tr><th>수령 방법</th><td>${o.delivery}${o.address ? ' — ' + o.address : ''}</td></tr>
+        </table>
+      `;
+    }
+
+    $('#btnSubmit').addEventListener('click', () => {
+      if (!validate()) return;
+      const order = buildOrder();
+      // 접수 내역 로컬 보관 (서버 연동 전 임시 저장소)
+      try {
+        const saved = JSON.parse(localStorage.getItem('pulppuri_orders') || '[]');
+        saved.push(order);
+        localStorage.setItem('pulppuri_orders', JSON.stringify(saved));
+      } catch (e) { /* 저장 실패해도 접수 화면은 표시 */ }
+      renderSheet(order);
+      $('#modalBack').classList.add('open');
+    });
+
+    $('#btnClose').addEventListener('click', () => $('#modalBack').classList.remove('open'));
+    $('#modalBack').addEventListener('click', (e) => {
+      if (e.target === $('#modalBack')) $('#modalBack').classList.remove('open');
+    });
+
+    $('#btnReset').addEventListener('click', () => {
+      if (!confirm('입력한 내용을 모두 초기화할까요?')) return;
+      state.herbs = []; state.preset = '';
+      $('#preset').value = ''; $('#special').value = '';
+      ['clinic','doctor','phone','patient','patientAge','address'].forEach(id => $('#' + id).value = '');
+      renderHerbTable(); renderOptions(); update();
+    });
+
+    /* ===================================================== */
+    renderFormTypes();
+    renderPresets();
+    renderHerbTable();
+    renderOptions();
+    update();
+  </script>
+
+</body>
+</html>
