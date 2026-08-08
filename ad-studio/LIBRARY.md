@@ -34,3 +34,15 @@
 - `subtle film grain, documentary editorial realism, not digitally smoothed, no beauty retouching, no AI-perfect skin`
 - 조명은 스튜디오 대신 `soft diffused window daylight`
 주의: 필름 스캔 테두리가 같이 생성되므로 합성 시 크롭으로 제거할 것.
+
+## 영상 소재
+
+| job id | 모델 | 내용 | 스펙 | 생성일 |
+|---|---|---|---|---|
+| `1bd7464b-526e-46d2-a3cf-392497661091` | kling3_0_turbo | 리얼스킨 B컷 포트레이트 애니메이션 — 느린 푸시인, 시선 이동, 미세 호흡. `assets/video/pigment-portrait-b-5s.mp4` | 5s, 828×1108, h264+aac, 7.5크레딧 | 2026-08-07 |
+
+영상 모션 레시피(검증됨): 이미지→영상은 start_image로 job_id 전달, 모션은 절제가 핵심 —
+"breathing gently, slowly blinks once, gaze drifts, hair strands sway imperceptibly, slow gentle camera push-in,
+keep film grain and natural skin texture, no morphing, no warping, restrained elegant motion".
+프리셋 추천(IN THE DARK 등)이 떠도 브랜드 무드(라이트 미니멀)와 안 맞으면 declined_preset_id로 거절하고 리터럴 생성.
+영상 QA: 로컬 ffmpeg는 h264 디코드 불가 → 샌드박스 ffmpeg로 5프레임 콘택트 시트를 만들어 asset-sync로 가져와 확인.
