@@ -3,267 +3,564 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MEDICAL O · 색소 프로그램 | 기미 · 주근깨 · 잡티</title>
-  <meta name="description" content="메디컬오 색소 프로그램 — 지워도 다시 올라오는 색소, 깊이까지 보고 치료합니다." />
+  <title>풀뿌리원외탕전실 | 뿌리부터 정직한 한약</title>
+  <meta name="description" content="풀뿌리원외탕전실 — 정직한 약재, 체계적인 품질검사, 1:1 맞춤 조제. 한의원·한방병원을 위한 원외탕전 서비스." />
 
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* =========================================================
+       풀뿌리원외탕전실 — Main (Draft)
+       MEDICAL O Brand Guideline ver2.0 준수
+       · Color: White / Black + Light Gray, Concept(풀뿌리) #2F5D3F
+       · KR: 산돌고딕 Neo1 (fallback: Pretendard 계열 고딕)
+       · EN: Helvetica Neue
+       · 이탤릭 · 폰트 이펙트(그림자/그라데이션) 사용 안 함
+       ========================================================= */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:      #ffffff;
+      --gray:    #f6f6f7;   /* Light Gray */
+      --ink:     #111111;   /* Black */
+      --soft:    #55565a;
+      --mute:    #97989c;
+      --line:    #e9e9eb;
+      --concept: #2F5D3F;   /* 풀뿌리 Concept Green — 포인트 한정 사용 */
+      --max: 1160px;
+      --ease: cubic-bezier(.22,.61,.36,1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Sandoll GothicNeo1', 'Helvetica Neue', Pretendard,
+                   'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      font-size: 16px;
+      line-height: 1.65;
+      letter-spacing: -0.01em;
+      word-break: keep-all;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    .en { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+    :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+    /* ---------- HEADER ---------- */
+    .header {
+      position: fixed; inset: 0 0 auto 0; z-index: 100;
+      height: 64px; background: rgba(255,255,255,.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center;
+    }
+    .header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+
+    .logo { display: inline-flex; align-items: center; gap: 9px; }
+    .logo svg { display: block; height: 26px; width: auto; color: var(--concept); }
+    .logo-text { line-height: 1.2; }
+    .logo-text b { font-size: 16.5px; font-weight: 700; letter-spacing: -0.01em; }
+    .logo-text span { display: block; font-size: 9.5px; letter-spacing: .22em; color: var(--mute); font-family: 'Helvetica Neue', sans-serif; }
+
+    .nav { display: flex; gap: 30px; }
+    .nav a { font-size: 14.5px; font-weight: 500; color: var(--soft); padding: 8px 0; transition: color .25s var(--ease); }
+    .nav a:hover { color: var(--ink); }
+
+    .nav-cta {
+      display: inline-flex; align-items: center;
+      padding: 9px 20px; border-radius: 999px;
+      background: var(--ink); color: #fff;
+      font-size: 13.5px; font-weight: 600;
+      transition: opacity .25s var(--ease);
+    }
+    .nav-cta:hover { opacity: .8; }
+
+    .hamburger { display: none; background: none; border: 0; cursor: pointer; padding: 8px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--ink); margin: 5px 0; }
+
+    /* ---------- HERO ---------- */
+    .hero { padding: 148px 0 0; text-align: center; background: var(--bg); }
+    .hero-eyebrow {
+      display: inline-block; margin-bottom: 18px;
+      font-size: 13px; font-weight: 600; letter-spacing: .02em;
+      color: var(--concept);
+      border: 1px solid var(--line); border-radius: 999px; padding: 7px 16px;
+    }
+    .hero h1 {
+      font-size: clamp(27px, 4.6vw, 46px);
+      font-weight: 700; line-height: 1.42; letter-spacing: -0.02em;
+    }
+    .hero h1 strong { color: var(--concept); font-weight: 700; }
+    .hero .sub {
+      margin: 20px auto 0; max-width: 560px;
+      font-size: clamp(15px, 2.4vw, 17.5px); color: var(--soft);
+    }
+    .hero-actions { margin-top: 32px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 15px 30px; border-radius: 999px;
+      font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+      transition: opacity .25s var(--ease), border-color .25s var(--ease);
+      border: 1px solid transparent;
+    }
+    .btn-dark { background: var(--ink); color: #fff; }
+    .btn-dark:hover { opacity: .82; }
+    .btn-line { border-color: #d5d5d8; color: var(--ink); background: #fff; }
+    .btn-line:hover { border-color: var(--ink); }
+
+    .hero-figure {
+      margin: 56px auto 0; max-width: 860px;
+      aspect-ratio: 16/8; background: var(--gray);
+      display: grid; place-items: center; color: var(--mute); font-size: 14px;
+    }
+
+    /* ---------- SECTIONS ---------- */
+    .section { padding: 110px 0; }
+    .section.gray { background: var(--gray); }
+    .section.black { background: var(--ink); color: #fff; }
+
+    .head-center { text-align: center; max-width: 680px; margin: 0 auto 56px; }
+    .sec-tag { display: block; margin-bottom: 12px; font-size: 12.5px; font-weight: 600; letter-spacing: .16em; color: var(--concept); font-family: 'Helvetica Neue', sans-serif; text-transform: uppercase; }
+    .section.black .sec-tag { color: #9db8a6; }
+    .section-title {
+      font-size: clamp(22px, 3.4vw, 34px);
+      font-weight: 700; line-height: 1.45; letter-spacing: -0.02em;
+    }
+    .section-lead { margin-top: 16px; font-size: 16.5px; color: var(--soft); }
+    .section.black .section-lead { color: #b9babe; }
+    .head-center .section-lead { margin-left: auto; margin-right: auto; max-width: 560px; }
+
+    /* ---------- 핵심 강점 ---------- */
+    .strength-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .s-card { background: #fff; border: 1px solid var(--line); padding: 34px 26px; }
+    .s-card .num { font-family: 'Helvetica Neue', sans-serif; font-size: 13px; font-weight: 600; color: var(--concept); letter-spacing: .1em; }
+    .s-card h3 { margin-top: 14px; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+    .s-card p { margin-top: 10px; font-size: 14.5px; color: var(--soft); }
+
+    /* ---------- 소개 (split) ---------- */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+    .split .figure {
+      aspect-ratio: 4/3.4; background: var(--gray);
+      display: grid; place-items: center; color: var(--mute); font-size: 14px; text-align: center;
+    }
+    .about-list { margin-top: 28px; border-top: 1px solid var(--line); }
+    .about-list li {
+      display: flex; gap: 12px; padding: 13px 2px;
+      border-bottom: 1px solid var(--line);
+      font-size: 15px; color: var(--soft);
+    }
+    .about-list li::before { content: "—"; color: var(--concept); font-weight: 600; }
+    .split .btn { margin-top: 30px; }
+
+    .stats { display: grid; grid-template-columns: repeat(4,1fr); margin-top: 52px; border-top: 1px solid var(--line); }
+    .stats .stat { padding: 28px 6px 4px; text-align: center; border-right: 1px solid var(--line); }
+    .stats .stat:last-child { border-right: none; }
+    .stats b { display: block; font-size: 27px; font-weight: 700; letter-spacing: -0.02em; }
+    .stats b em { font-style: normal; color: var(--concept); }
+    .stats span { display: block; margin-top: 6px; font-size: 13.5px; color: var(--mute); }
+
+    /* ---------- 조제 프로세스 ---------- */
+    .process-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; counter-reset: step; }
+    .p-step { background: #fff; border: 1px solid var(--line); padding: 26px 18px 24px; counter-increment: step; }
+    .p-step::before {
+      content: "0" counter(step);
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 12.5px; font-weight: 600; letter-spacing: .12em; color: var(--concept);
+    }
+    .p-step h3 { margin-top: 12px; font-size: 15.5px; font-weight: 700; }
+    .p-step p { margin-top: 6px; font-size: 12.8px; color: var(--soft); line-height: 1.55; }
+
+    /* ---------- 제형 안내 (black section) ---------- */
+    .forms-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .f-card { border: 1px solid #2a2b2e; padding: 30px 26px; transition: border-color .25s var(--ease); }
+    .f-card:hover { border-color: #5b7d67; }
+    .f-card .en { font-size: 11.5px; font-weight: 600; letter-spacing: .14em; color: #9db8a6; text-transform: uppercase; }
+    .f-card h3 { margin-top: 10px; font-size: 19px; font-weight: 700; }
+    .f-card p { margin-top: 8px; font-size: 14px; color: #b9babe; }
+
+    /* ---------- 품질 · 안전 ---------- */
+    .q-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; }
+    .q-items { display: grid; gap: 12px; }
+    .q-item { background: #fff; border: 1px solid var(--line); padding: 24px 26px; display: flex; gap: 18px; }
+    .q-item .no { flex: none; font-family: 'Helvetica Neue', sans-serif; font-size: 13px; font-weight: 600; color: var(--concept); padding-top: 3px; }
+    .q-item h3 { font-size: 16px; font-weight: 700; }
+    .q-item p { margin-top: 5px; font-size: 14px; color: var(--soft); }
+
+    /* ---------- 공지 + 문의 ---------- */
+    .nc-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 16px; align-items: stretch; }
+    .panel { background: #fff; border: 1px solid var(--line); padding: 36px; }
+    .panel-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+    .panel-head h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+    .panel-head a { font-size: 13.5px; color: var(--mute); }
+    .panel-head a:hover { color: var(--ink); }
+    .notice-list li { border-bottom: 1px solid var(--line); }
+    .notice-list li:last-child { border-bottom: none; }
+    .notice-list a { display: flex; justify-content: space-between; gap: 16px; padding: 14px 2px; font-size: 15px; color: var(--soft); }
+    .notice-list a:hover { color: var(--ink); }
+    .notice-list time { color: var(--mute); font-size: 13.5px; flex: none; font-family: 'Helvetica Neue', sans-serif; }
+
+    .contact-panel { background: var(--ink); color: #fff; border: 0; display: flex; flex-direction: column; }
+    .contact-panel h3 { font-size: 20px; font-weight: 700; }
+    .contact-panel > p { margin-top: 8px; font-size: 14.5px; color: #b9babe; }
+    .contact-panel .tel { margin-top: 22px; font-family: 'Helvetica Neue', sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -0.01em; }
+    .contact-panel .hours { margin-top: 4px; font-size: 13px; color: #97989c; }
+    .contact-panel .btns { margin-top: auto; padding-top: 26px; display: grid; gap: 8px; }
+    .contact-panel .btns a {
+      display: block; text-align: center; padding: 13px; border: 1px solid #2a2b2e;
+      font-size: 14px; font-weight: 600; transition: border-color .25s var(--ease);
+    }
+    .contact-panel .btns a:hover { border-color: #fff; }
+
+    /* ---------- 오시는 길 ---------- */
+    .loc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+    .map-ph {
+      aspect-ratio: 16/10; background: var(--gray);
+      display: grid; place-items: center; color: var(--mute); font-size: 14px;
+    }
+    .loc-info dl { display: grid; grid-template-columns: 92px 1fr; row-gap: 13px; margin-top: 28px; font-size: 15px; border-top: 1px solid var(--line); padding-top: 26px; }
+    .loc-info dt { font-weight: 700; }
+    .loc-info dd { color: var(--soft); }
+
+    /* ---------- FOOTER ---------- */
+    footer { background: var(--gray); border-top: 1px solid var(--line); padding: 52px 0 44px; font-size: 13.5px; color: var(--soft); }
+    .foot-top { display: flex; justify-content: space-between; gap: 30px; flex-wrap: wrap; margin-bottom: 26px; }
+    .foot-logo b { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .foot-logo span { display: block; font-size: 10px; letter-spacing: .2em; color: var(--mute); font-family: 'Helvetica Neue', sans-serif; margin-top: 3px; }
+    .foot-links { display: flex; gap: 22px; align-items: center; }
+    .foot-links a:hover { color: var(--ink); }
+    .foot-info { line-height: 1.9; border-top: 1px solid var(--line); padding-top: 22px; }
+    .foot-info .copy { margin-top: 10px; color: var(--mute); font-family: 'Helvetica Neue', sans-serif; }
+
+    /* ---------- 반응형 ---------- */
+    @media (max-width: 960px) {
+      .section { padding: 72px 0; }
+      .nav, .header .nav-cta { display: none; }
+      .hamburger { display: block; }
+      .mobile-open .nav {
+        display: flex; flex-direction: column; gap: 0;
+        position: absolute; top: 64px; left: 0; right: 0;
+        background: #fff; border-bottom: 1px solid var(--line); padding: 8px 0;
+      }
+      .mobile-open .nav a { padding: 13px 26px; }
+      .strength-grid { grid-template-columns: repeat(2, 1fr); }
+      .split, .q-grid, .loc-grid { grid-template-columns: 1fr; gap: 40px; }
+      .process-grid { grid-template-columns: repeat(3, 1fr); }
+      .forms-grid { grid-template-columns: repeat(2, 1fr); }
+      .nc-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .stats .stat { border-bottom: 1px solid var(--line); }
+      .stats .stat:nth-child(2n) { border-right: none; }
+    }
+    @media (max-width: 600px) {
+      .strength-grid, .forms-grid { grid-template-columns: 1fr; }
+      .process-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
 <body>
 
-  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
-    <symbol id="medicalo-logo" viewBox="130 1330 2800 470">
-<path fill="currentColor" d="M 2016.109375 1564.359375 L 1991.046875 1421.246094 L 1895 1564.359375 Z M 2021.507812 1699.378906 L 2019.78125 1699.378906 L 2022.308594 1696.71875 C 2031.21875 1687.820312 2033.125 1670.527344 2028.914062 1637.027344 L 2018.261719 1577.375 L 1885.390625 1577.375 L 1853.132812 1626.421875 C 1831.378906 1661.363281 1824.296875 1682.511719 1829.472656 1697.109375 L 1830.515625 1699.378906 L 1781.660156 1699.378906 C 1801.222656 1677.859375 1810.0625 1666.390625 1826.378906 1642.734375 L 1832.648438 1633.652344 L 2010.628906 1369.738281 L 2026.257812 1369.738281 L 2075.710938 1638.476562 L 2079.40625 1654.675781 C 2084.589844 1677.605469 2087.929688 1688.589844 2093.570312 1699.378906 Z M 2021.507812 1699.378906 "/>
-<path fill="currentColor" d="M 1603.832031 1700.679688 C 1547.304688 1700.679688 1503.847656 1683.371094 1478.132812 1650.621094 C 1455.203125 1621.398438 1448.261719 1582.023438 1458.601562 1539.742188 C 1484.078125 1435.546875 1577.347656 1362.777344 1685.398438 1362.777344 C 1725.996094 1362.777344 1785.953125 1379.472656 1807.070312 1403.429688 L 1788.097656 1471.734375 C 1785.042969 1437.164062 1757.300781 1375.191406 1677.402344 1375.191406 C 1616.820312 1375.191406 1543.558594 1424.789062 1516.457031 1535.59375 C 1505.050781 1582.257812 1510.429688 1622.808594 1531.597656 1649.773438 C 1549.839844 1673.019531 1578.585938 1685.304688 1614.738281 1685.304688 C 1672.726562 1685.304688 1741.773438 1630.65625 1773.042969 1584.910156 L 1746.28125 1656.097656 C 1726.320312 1674.257812 1672.230469 1700.679688 1603.832031 1700.679688 "/>
-<path fill="currentColor" d="M 1029.722656 1382.144531 C 1005.683594 1382.144531 989.367188 1384.328125 982.316406 1395.191406 C 978.066406 1401.734375 976.167969 1411.734375 976.167969 1427.609375 L 976.167969 1648.730469 C 976.167969 1657.957031 977.820312 1664.699219 981.375 1669.941406 C 989.105469 1681.402344 1009.214844 1686.96875 1042.851562 1686.96875 C 1137.105469 1686.96875 1189.015625 1635.222656 1189.015625 1541.269531 C 1189.015625 1440.144531 1130.953125 1382.144531 1029.722656 1382.144531 M 916.871094 1699.375 C 916.992188 1699.261719 930.589844 1685.546875 930.589844 1654.917969 L 930.589844 1414.195312 C 930.589844 1383.566406 916.992188 1369.859375 916.871094 1369.742188 L 1033.539062 1369.738281 C 1106.949219 1369.738281 1245.785156 1405.371094 1245.785156 1540.242188 C 1245.785156 1649.578125 1153.917969 1699.375 1068.554688 1699.375 Z M 916.871094 1699.375 "/>
-<path fill="currentColor" d="M 597.371094 1699.375 C 597.402344 1699.339844 601.847656 1693.882812 606.25 1685.253906 C 609.40625 1679.0625 610.757812 1669.992188 610.757812 1654.917969 L 610.757812 1414.195312 C 610.757812 1383.566406 597.148438 1369.859375 597.027344 1369.742188 L 824.242188 1369.738281 L 831.089844 1408.191406 C 811.457031 1388.574219 802.699219 1384.214844 759.992188 1384.214844 L 687.160156 1384.214844 C 660.019531 1384.214844 655.929688 1386.78125 655.929688 1403.84375 L 655.929688 1522.691406 L 751.90625 1522.691406 C 782.640625 1522.691406 796.238281 1513.769531 796.359375 1513.6875 L 796.359375 1545.054688 C 796.238281 1544.972656 782.640625 1536.054688 751.90625 1536.054688 L 655.929688 1536.054688 L 655.929688 1662.167969 C 655.929688 1676.839844 663.328125 1682.523438 680.777344 1682.617188 C 698.230469 1682.714844 775.425781 1680.550781 775.425781 1680.550781 C 827.671875 1680.550781 855.910156 1645.691406 855.910156 1645.691406 L 839.644531 1699.375 Z M 597.371094 1699.375 "/>
-<path fill="currentColor" d="M 1315.523438 1699.375 C 1315.644531 1699.253906 1329.261719 1685.546875 1329.261719 1654.917969 L 1329.261719 1414.195312 C 1329.261719 1383.566406 1315.65625 1369.859375 1315.535156 1369.742188 L 1388.324219 1369.738281 C 1388.203125 1369.851562 1374.585938 1383.566406 1374.585938 1414.195312 L 1374.585938 1654.917969 C 1374.585938 1685.546875 1388.195312 1699.25 1388.316406 1699.371094 Z M 1315.523438 1699.375 "/>
-<path fill="currentColor" d="M 445.945312 1699.375 C 445.984375 1699.324219 451.484375 1692.882812 454.445312 1681.882812 C 456.558594 1674.039062 457.632812 1664.96875 457.632812 1654.917969 L 457.644531 1410.496094 L 318.734375 1689.527344 L 308.414062 1689.527344 L 164.699219 1406.589844 L 164.699219 1654.917969 C 164.699219 1685.585938 176.296875 1699.253906 176.398438 1699.371094 L 139.65625 1699.375 C 139.757812 1699.261719 151.355469 1685.585938 151.355469 1654.917969 L 151.355469 1414.195312 C 151.355469 1383.527344 139.757812 1369.859375 139.65625 1369.742188 L 193.707031 1369.679688 L 329.765625 1637.957031 L 462.542969 1369.738281 L 512.058594 1369.738281 C 512.019531 1369.789062 506.347656 1376.46875 503.375 1388.015625 C 501.394531 1395.683594 500.378906 1404.488281 500.378906 1414.195312 L 500.378906 1654.917969 C 500.378906 1671.265625 503.261719 1682.167969 505.6875 1688.433594 C 508.132812 1694.785156 512.050781 1699.339844 512.070312 1699.371094 "/>
-<path fill="currentColor" d="M 2128.222656 1698.789062 C 2128.222656 1698.789062 2134.847656 1693.3125 2142.273438 1684.457031 C 2148.046875 1677.566406 2152.765625 1668.671875 2158.152344 1653.976562 L 2246.4375 1413.25 C 2257.582031 1382.851562 2244.492188 1369.160156 2244.492188 1369.160156 L 2328.246094 1369.160156 C 2328.203125 1369.183594 2322.152344 1372.992188 2318.855469 1375.75 C 2316.015625 1378.101562 2311.671875 1382.15625 2307.035156 1388.128906 C 2301.070312 1395.808594 2296.230469 1404.632812 2292.648438 1414.347656 L 2201.621094 1662.527344 C 2199.023438 1669.617188 2198.71875 1674.074219 2200.636719 1676.988281 C 2202.851562 1680.335938 2210.707031 1682.785156 2218.667969 1682.621094 C 2226.632812 1682.453125 2318.207031 1680.550781 2318.207031 1680.550781 C 2370.53125 1680.550781 2410.414062 1646.753906 2410.769531 1646.433594 L 2383.175781 1699.378906 Z M 2128.222656 1698.789062 "/>
-<path fill="currentColor" d="M 2884.265625 1694.058594 C 2867.980469 1694.058594 2853.695312 1679.207031 2853.695312 1662.273438 C 2853.695312 1645.335938 2867.980469 1630.480469 2884.265625 1630.480469 C 2900.550781 1630.480469 2914.835938 1645.335938 2914.835938 1662.273438 C 2914.835938 1679.207031 2900.550781 1694.058594 2884.265625 1694.058594 M 2884.265625 1625.167969 C 2863.914062 1625.167969 2847.351562 1641.8125 2847.351562 1662.273438 C 2847.351562 1682.730469 2863.914062 1699.375 2884.265625 1699.375 C 2904.621094 1699.375 2921.179688 1682.730469 2921.179688 1662.273438 C 2921.179688 1641.464844 2904.964844 1625.167969 2884.265625 1625.167969 "/>
-<path fill="currentColor" d="M 2883.804688 1661.589844 L 2875.675781 1661.589844 L 2875.675781 1644.488281 L 2883.460938 1644.488281 C 2887.054688 1644.488281 2891.34375 1645.84375 2891.34375 1652.332031 C 2891.34375 1656.554688 2890.035156 1661.589844 2883.804688 1661.589844 M 2905.101562 1681.152344 C 2902.257812 1679.039062 2898.035156 1675.171875 2895.015625 1671.304688 L 2889.109375 1662.984375 C 2894.457031 1661.097656 2897.507812 1657.074219 2897.507812 1651.878906 C 2897.507812 1644.972656 2891 1641.882812 2884.546875 1641.882812 L 2867.652344 1641.882812 L 2867.246094 1641.984375 L 2867.246094 1642.625 L 2867.464844 1642.742188 C 2869.050781 1643.566406 2869.265625 1646.421875 2869.265625 1649.113281 L 2869.265625 1674.070312 C 2869.265625 1679.308594 2869.074219 1680.078125 2867.558594 1680.914062 L 2867.351562 1681.234375 L 2867.351562 1681.871094 L 2877.144531 1681.871094 L 2877.550781 1681.660156 L 2877.550781 1681.023438 L 2877.339844 1680.90625 C 2875.695312 1680.023438 2875.695312 1679.171875 2875.695312 1674.355469 L 2875.695312 1664.191406 L 2883.0625 1664.191406 C 2885.097656 1667.128906 2886.796875 1669.789062 2888.273438 1672.101562 C 2892.171875 1678.191406 2894.527344 1681.871094 2897.390625 1681.871094 L 2906.070312 1681.871094 Z M 2905.101562 1681.152344 "/>
-<path fill="currentColor" d="M 2818.199219 1554.722656 C 2860.214844 1445.457031 2830.324219 1374.613281 2762.414062 1369.019531 C 2703.894531 1364.199219 2625.945312 1405.148438 2587.117188 1506.109375 C 2545.101562 1615.378906 2574.539062 1686.183594 2643.339844 1691.851562 C 2701.421875 1696.632812 2779.371094 1655.695312 2818.199219 1554.722656 M 2528.246094 1516.054688 C 2569.367188 1409.121094 2676.960938 1348.976562 2769.496094 1356.59375 C 2862.03125 1364.21875 2918.183594 1437.851562 2877.0625 1544.78125 C 2835.941406 1651.722656 2728.34375 1711.871094 2635.808594 1704.25 C 2543.273438 1696.628906 2487.121094 1622.992188 2528.246094 1516.054688 "/>
-</symbol>
-  </svg>
-
   <!-- ================= HEADER ================= -->
-  <header class="header" id="header" data-lp-group="hd" data-lp-label="헤더">
+  <header class="header" id="header">
     <div class="wrap">
-      <a href="#top" class="logo-mark" aria-label="MEDICAL O 홈">
-        <svg role="img" aria-hidden="true"><use href="#medicalo-logo"></use></svg>
+      <a href="#top" class="logo" aria-label="풀뿌리원외탕전실 홈">
+        <!-- 풀뿌리 심볼(새싹+뿌리) — 추후 실제 로고 파일로 교체 -->
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="M16 18 C16 12 12 8 6 8 C6 14 10 18 16 18 Z" fill="currentColor"/>
+          <path d="M16 15 C16 10 20 6 26 6 C26 12 22 16 16 16 Z" fill="currentColor" opacity=".55"/>
+          <path d="M16 18 L16 26 M16 21 L11 26 M16 21 L21 26" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-text">
+          <b>풀뿌리원외탕전실</b>
+          <span class="en">PULPPURI HERBAL DISPENSARY</span>
+        </span>
       </a>
-      <nav class="nav" data-lp="hd-nav" data-lp-label="메뉴">
-        <a href="#promotion">프로모션</a>
-        <a href="#about">병원소개</a>
-        <a href="#beforeafter">비포애프터</a>
-        <a href="#research">연구</a>
+
+      <nav class="nav" aria-label="주 메뉴">
+        <a href="#about">탕전실 소개</a>
+        <a href="#process">조제 시스템</a>
+        <a href="#forms">제형 안내</a>
+        <a href="#quality">품질 · 안전</a>
+        <a href="#news">공지사항</a>
+        <a href="#location">오시는 길</a>
       </nav>
-      <a href="#consult" class="nav-cta" data-lp="hd-cta" data-lp-label="상담예약 버튼">상담예약</a>
+
+      <a href="#contact" class="nav-cta">조제 의뢰하기</a>
+      <button class="hamburger" aria-label="메뉴 열기" onclick="document.getElementById('header').classList.toggle('mobile-open')">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </header>
 
-  <!-- ================= HERO ================= -->
-  <section class="hero" id="top" data-lp-group="hero" data-lp-label="히어로">
+  <!-- ================= 1. HERO ================= -->
+  <section class="hero" id="top">
     <div class="wrap">
-      <h1 data-lp="hero-title" data-lp-label="리드카피">지워도 다시 올라오는 색소,<br />깊이까지 보고 치료합니다.</h1>
-      <p class="sub" data-lp="hero-sub" data-lp-label="서브카피">표면만 걷어내면 다시 올라옵니다.<br />색소의 깊이와 원인까지 진단하고 치료 계획을 세웁니다.</p>
-      <div class="hero-actions" data-lp="hero-actions" data-lp-label="버튼">
-        <a href="#consult" class="btn btn-dark">상담 예약하기</a>
-        <a href="#program" class="btn btn-line">치료 프로그램 보기</a>
+      <span class="hero-eyebrow">보건복지부 신고 원외탕전실 · 의정부</span>
+      <h1>
+        뿌리부터 정직하게,<br />
+        한 첩까지 <strong>풀뿌리</strong>가 약속합니다
+      </h1>
+      <p class="sub">
+        규격 한약재 입고 검수부터 조제 · 검수 · 포장 · 배송까지,
+        한의원과 한방병원의 처방을 가장 정확하고 안전하게 조제하는 원외탕전 파트너입니다.
+      </p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-dark">조제 의뢰 안내</a>
+        <a href="#about" class="btn btn-line">탕전실 둘러보기</a>
       </div>
-      <div class="hero-figure">
-        <img src="images/hero.jpg" alt="색소가 보이는 피부" data-lp="hero-img" data-lp-label="메인 이미지" onerror="this.style.display='none'" />
-      </div>
+      <div class="hero-figure">메인 비주얼 자리 — 탕전실 · 약재 사진 (추후 교체)</div>
     </div>
   </section>
 
-  <!-- ================= WHY ================= -->
-  <section class="section" id="why" data-lp-group="why" data-lp-label="치료 철학">
-    <div class="wrap split">
-      <div class="reveal">
-        <h2 class="section-title" data-lp="why-title" data-lp-label="타이틀">색소는 없애는 것이 아니라<br />다스리는 것입니다</h2>
-        <p class="section-lead" data-lp="why-lead" data-lp-label="본문">
-          같은 기미도 사람마다 원인과 깊이가 다릅니다.
-          자외선, 호르몬, 열, 피부 장벽의 상태까지 —
-          색소가 생기는 근본 원인을 진단하고 재발까지 고려해 치료 계획을 세웁니다.
-        </p>
-        <div class="stats" data-lp="why-stats" data-lp-label="통계">
-          <div class="stat"><div class="num">12</div><div class="lbl">색소 전용 장비</div></div>
-          <div class="stat"><div class="num">1:1</div><div class="lbl">원장 직접 진단</div></div>
-          <div class="stat"><div class="num">98%</div><div class="lbl">재방문 만족도</div></div>
-        </div>
-      </div>
-      <div class="reveal">
-        <div class="figure"><img src="images/why.jpg" alt="피부 진단" data-lp="why-img" data-lp-label="이미지" onerror="this.style.display='none'" /></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= TYPES ================= -->
-  <section class="section gray" id="about" data-lp-group="types" data-lp-label="색소 종류">
+  <!-- ================= 2. 핵심 강점 ================= -->
+  <section class="section gray">
     <div class="wrap">
-      <div class="head-center reveal">
-        <h2 class="section-title" data-lp="types-title" data-lp-label="타이틀">내 피부의 색소,<br />어떤 유형인가요?</h2>
-        <p class="section-lead" data-lp="types-lead" data-lp-label="본문">정확한 유형 진단이 치료의 시작입니다. 색소의 종류에 따라 접근을 달리합니다.</p>
+      <div class="head-center">
+        <span class="sec-tag en">Why Pulppuri</span>
+        <h2 class="section-title">풀뿌리가 다른 이유</h2>
+        <p class="section-lead">좋은 한약은 좋은 약재와 정직한 과정에서 나옵니다. 풀뿌리원외탕전실은 기본을 지키는 일에 가장 많은 시간을 씁니다.</p>
       </div>
-      <div class="cards">
-        <article class="card reveal" data-lp="type-card-1" data-lp-label="카드 – 기미">
-          <div class="thumb"><img src="images/type-melasma.jpg" alt="기미" onerror="this.style.opacity=0"></div>
-          <div class="body"><h3>기미</h3><p>경계가 흐릿하고 넓게 번지는 색소. 열과 호르몬에 예민해 저자극 치료가 핵심입니다.</p><span class="tag">MELASMA</span></div>
-        </article>
-        <article class="card reveal" data-lp="type-card-2" data-lp-label="카드 – 주근깨">
-          <div class="thumb"><img src="images/type-freckle.jpg" alt="주근깨" onerror="this.style.opacity=0"></div>
-          <div class="body"><h3>주근깨</h3><p>작은 점 형태로 흩어진 색소. 자외선에 의해 짙어지며 정밀 레이저에 잘 반응합니다.</p><span class="tag">FRECKLES</span></div>
-        </article>
-        <article class="card reveal" data-lp="type-card-3" data-lp-label="카드 – 잡티">
-          <div class="thumb"><img src="images/type-spot.jpg" alt="잡티" onerror="this.style.opacity=0"></div>
-          <div class="body"><h3>잡티 · 검버섯</h3><p>경계가 뚜렷한 갈색 색소. 표피층에 있어 비교적 빠른 개선을 기대할 수 있습니다.</p><span class="tag">LENTIGO</span></div>
-        </article>
-        <article class="card reveal" data-lp="type-card-4" data-lp-label="카드 – 진피/오타">
-          <div class="thumb"><img src="images/type-ota.jpg" alt="오타모반" onerror="this.style.opacity=0"></div>
-          <div class="body"><h3>진피 색소 · 오타</h3><p>피부 깊은 진피층의 청회색 색소. 전용 파장의 레이저로 단계적으로 접근합니다.</p><span class="tag">DERMAL</span></div>
-        </article>
+      <div class="strength-grid">
+        <div class="s-card">
+          <span class="num en">01</span>
+          <h3>정직한 약재</h3>
+          <p>hGMP 규격 한약재만 입고하고, 입고 시 전 품목을 검수합니다. 원산지와 이력을 투명하게 관리합니다.</p>
+        </div>
+        <div class="s-card">
+          <span class="num en">02</span>
+          <h3>체계적 품질검사</h3>
+          <p>잔류농약 · 중금속 · 미생물 등 안전성 검사 절차를 운영하며, 검사 결과를 기록하고 보관합니다.</p>
+        </div>
+        <div class="s-card">
+          <span class="num en">03</span>
+          <h3>1:1 맞춤 조제</h3>
+          <p>처방전 하나하나를 한약사가 검토하고, 처방 의도에 맞는 전탕 조건으로 개별 조제합니다.</p>
+        </div>
+        <div class="s-card">
+          <span class="num en">04</span>
+          <h3>신속 · 안전 배송</h3>
+          <p>당일 조제 · 당일 출고를 원칙으로, 신선도를 지키는 포장으로 전국에 배송합니다.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ================= PROGRAM ================= -->
-  <section class="section" id="program" data-lp-group="program" data-lp-label="치료 프로그램">
+  <!-- ================= 3. 탕전실 소개 ================= -->
+  <section class="section" id="about">
     <div class="wrap">
-      <div class="head-center reveal">
-        <h2 class="section-title" data-lp="program-title" data-lp-label="타이틀">진단부터 관리까지,<br />세 단계로 설계합니다</h2>
-      </div>
-      <div class="prog">
-        <div class="prog-row reveal" data-lp="prog-1" data-lp-label="STEP 01 진단">
-          <div class="prog-media"><img src="images/prog-1.jpg" alt="정밀 진단" onerror="this.style.opacity=0"></div>
-          <div class="prog-txt">
-            <span class="prog-no">STEP 01</span>
-            <h3>피부 정밀 진단</h3>
-            <p>육안으로 보이지 않는 표피·진피 색소까지, 피부 분석 장비로 색소의 깊이와 분포를 확인합니다.</p>
-            <ul><li>UV·편광 피부 촬영 분석</li><li>색소 깊이 및 유형 판별</li><li>원장 1:1 진단 상담</li></ul>
-          </div>
-        </div>
-        <div class="prog-row reveal" data-lp="prog-2" data-lp-label="STEP 02 치료">
-          <div class="prog-media"><img src="images/prog-2.jpg" alt="맞춤 레이저 치료" onerror="this.style.opacity=0"></div>
-          <div class="prog-txt">
-            <span class="prog-no">STEP 02</span>
-            <h3>맞춤 레이저 치료</h3>
-            <p>하나의 장비로 모든 색소를 다루지 않습니다. 유형과 깊이에 맞춰 파장과 강도를 조합합니다.</p>
-            <ul><li>토닝 · 피코 · IPL 복합 설계</li><li>열 손상 최소화 저자극 세팅</li><li>회복력을 고려한 회차 조절</li></ul>
-          </div>
-        </div>
-        <div class="prog-row reveal" data-lp="prog-3" data-lp-label="STEP 03 관리">
-          <div class="prog-media"><img src="images/prog-3.jpg" alt="재발 방지 관리" onerror="this.style.opacity=0"></div>
-          <div class="prog-txt">
-            <span class="prog-no">STEP 03</span>
-            <h3>재발 방지 관리</h3>
-            <p>치료만큼 중요한 것은 유지입니다. 피부 장벽을 회복하고 색소 재생성을 억제하는 관리를 함께 설계합니다.</p>
-            <ul><li>피부 장벽 회복 케어</li><li>자외선 차단 · 생활 가이드</li><li>정기 경과 확인</li></ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= BEFORE / AFTER ================= -->
-  <section class="section gray" id="beforeafter" data-lp-group="ba" data-lp-label="비포애프터">
-    <div class="wrap">
-      <div class="head-center reveal">
-        <h2 class="section-title" data-lp="ba-title" data-lp-label="타이틀">변화를 기록으로 보여드립니다</h2>
-        <p class="section-lead" data-lp="ba-lead" data-lp-label="본문">동일한 조건에서 촬영한 실제 경과 사례입니다.</p>
-      </div>
-      <div class="ba-grid">
-        <div class="ba reveal" data-lp="ba-1" data-lp-label="사례 1">
-          <div class="imgs">
-            <figure><img src="images/ba-1a.jpg" alt="치료 전" onerror="this.style.opacity=0"><figcaption>BEFORE</figcaption></figure>
-            <figure><img src="images/ba-1b.jpg" alt="치료 후" onerror="this.style.opacity=0"><figcaption>AFTER</figcaption></figure>
-          </div>
-          <div class="meta"><h4>양볼 기미 개선</h4><span>토닝 8회 · 3개월 경과</span></div>
-        </div>
-        <div class="ba reveal" data-lp="ba-2" data-lp-label="사례 2">
-          <div class="imgs">
-            <figure><img src="images/ba-2a.jpg" alt="치료 전" onerror="this.style.opacity=0"><figcaption>BEFORE</figcaption></figure>
-            <figure><img src="images/ba-2b.jpg" alt="치료 후" onerror="this.style.opacity=0"><figcaption>AFTER</figcaption></figure>
-          </div>
-          <div class="meta"><h4>주근깨 · 잡티 개선</h4><span>피코 3회 · 6주 경과</span></div>
-        </div>
-        <div class="ba reveal" data-lp="ba-3" data-lp-label="사례 3">
-          <div class="imgs">
-            <figure><img src="images/ba-3a.jpg" alt="치료 전" onerror="this.style.opacity=0"><figcaption>BEFORE</figcaption></figure>
-            <figure><img src="images/ba-3b.jpg" alt="치료 후" onerror="this.style.opacity=0"><figcaption>AFTER</figcaption></figure>
-          </div>
-          <div class="meta"><h4>검버섯 개선</h4><span>스팟 레이저 2회 · 4주 경과</span></div>
-        </div>
-      </div>
-      <p class="ba-note" data-lp="ba-note" data-lp-label="주의 문구">※ 시술 효과는 개인의 피부 상태에 따라 차이가 있을 수 있습니다.</p>
-    </div>
-  </section>
-
-  <!-- ================= RESEARCH ================= -->
-  <section class="section" id="research" data-lp-group="research" data-lp-label="연구">
-    <div class="wrap research">
-      <div class="reveal">
-        <h2 class="section-title" data-lp="research-title" data-lp-label="타이틀">근거 있는 치료를 연구합니다</h2>
-        <p class="section-lead" data-lp="research-lead" data-lp-label="본문">피부과학에 기반한 치료 프로토콜을 지속적으로 업데이트하며, 검증된 장비만을 도입합니다.</p>
-        <div class="feat-list">
-          <div class="item" data-lp="res-1" data-lp-label="연구 01"><div class="n">01</div><div><h4>맞춤 파장 레이저 시스템</h4><p>색소 유형별 최적 파장을 선택해 주변 조직 손상을 최소화합니다.</p></div></div>
-          <div class="item" data-lp="res-2" data-lp-label="연구 02"><div class="n">02</div><div><h4>피부 분석 진단 장비</h4><p>표피·진피 색소를 정량 분석해 치료 계획을 데이터로 세웁니다.</p></div></div>
-          <div class="item" data-lp="res-3" data-lp-label="연구 03"><div class="n">03</div><div><h4>회복·재생 관리 프로토콜</h4><p>치료 후 피부 장벽 회복과 색소 재발 억제를 함께 다룹니다.</p></div></div>
-        </div>
-      </div>
-      <div class="media reveal"><img src="images/research.jpg" alt="연구 장비" data-lp="research-img" data-lp-label="이미지" onerror="this.style.opacity=0"></div>
-    </div>
-  </section>
-
-  <!-- ================= PROMOTION ================= -->
-  <section class="section black" id="promotion" data-lp-group="promo" data-lp-label="프로모션">
-    <div class="wrap promo-inner">
-      <div class="reveal">
-        <span class="promo-badge" data-lp="promo-badge" data-lp-label="배지">SUMMER PROMOTION</span>
-        <h2 data-lp="promo-title" data-lp-label="타이틀">짙어지기 전에 시작하세요<br />여름 색소 집중 프로그램</h2>
-        <p class="desc" data-lp="promo-desc" data-lp-label="본문">자외선이 강한 계절, 진단부터 첫 치료까지 한 번에 받는 스타터 패키지를 준비했습니다.</p>
-        <p class="promo-save" data-lp="promo-save" data-lp-label="할인율">SAVE UP TO 34%</p>
-        <div class="promo-price" data-lp="promo-price" data-lp-label="가격">
-          <span class="was">290,000원</span>
-          <span class="now en">190,000원</span>
-        </div>
-        <a href="#consult" class="btn" data-lp="promo-btn" data-lp-label="버튼">프로모션 예약하기</a>
-      </div>
-      <div class="promo-media reveal"><img src="images/promo.jpg" alt="프로모션" data-lp="promo-img" data-lp-label="이미지" onerror="this.style.opacity=0"></div>
-    </div>
-  </section>
-
-  <!-- ================= CTA ================= -->
-  <section class="cta" id="consult" data-lp-group="cta" data-lp-label="상담 안내">
-    <div class="wrap reveal">
-      <h2 data-lp="cta-title" data-lp-label="타이틀">내 피부에 맞는 색소 치료,<br />상담으로 시작하세요</h2>
-      <p data-lp="cta-desc" data-lp-label="본문">원장이 직접 진단하고, 근본부터 치료 계획을 세웁니다.</p>
-      <a href="tel:0000000000" class="btn btn-dark" data-lp="cta-btn" data-lp-label="버튼">전화 상담 예약</a>
-    </div>
-  </section>
-
-  <!-- ================= FOOTER ================= -->
-  <footer class="footer" data-lp-group="ft" data-lp-label="푸터">
-    <div class="wrap">
-      <div class="top">
+      <div class="split">
+        <div class="figure">시설 사진 자리<br />(탕전실 · 조제실 전경)</div>
         <div>
-          <span class="logo-mark"><svg role="img" aria-label="MEDICAL O"><use href="#medicalo-logo"></use></svg></span>
-          <p class="tagline" data-lp="ft-tagline" data-lp-label="슬로건">FACE, YOUR LIFE</p>
-        </div>
-        <div class="cols" data-lp="ft-cols" data-lp-label="링크 메뉴">
-          <div><h5>PROGRAM</h5><a href="#why">치료 철학</a><a href="#about">색소 종류</a><a href="#program">치료 프로그램</a></div>
-          <div><h5>CLINIC</h5><a href="#beforeafter">비포애프터</a><a href="#research">연구·장비</a><a href="#promotion">프로모션</a></div>
-          <div><h5>CONTACT</h5><a href="#consult">상담예약</a><a href="tel:0000000000">전화문의</a><a href="#top">오시는 길</a></div>
+          <span class="sec-tag en">About Us</span>
+          <h2 class="section-title">기본을 지키는 탕전,<br />풀뿌리원외탕전실입니다</h2>
+          <p class="section-lead">
+            풀뿌리원외탕전실은 한의원 · 한방병원의 처방을 위탁받아 조제하는 원외탕전실입니다.
+            이름 그대로 '풀의 뿌리'부터 살피는 마음으로, 약재 선별에서 탕전 · 포장까지
+            모든 과정을 정직하게 운영합니다.
+          </p>
+          <ul class="about-list">
+            <li>보건복지부 신고 원외탕전실 운영</li>
+            <li>한약사 상주 — 전 처방 검토 및 조제 관리</li>
+            <li>입고 · 조제 · 포장 구역 분리 위생 관리</li>
+            <li>전 과정 기록 관리로 추적 가능한 조제 시스템</li>
+          </ul>
+          <a href="#" class="btn btn-line">탕전실 소개 더보기</a>
         </div>
       </div>
-      <div class="bottom" data-lp="ft-bottom" data-lp-label="하단 문구">
-        <span>© 2026 MEDICAL O. All rights reserved.</span>
-        <span>본 페이지의 시술 효과는 개인에 따라 다를 수 있습니다.</span>
+      <div class="stats">
+        <div class="stat"><b><em>00</em>년+</b><span>탕전 조제 경력</span></div>
+        <div class="stat"><b><em>000</em>+</b><span>제휴 한의원 · 병원</span></div>
+        <div class="stat"><b><em>00</em>만+</b><span>누적 조제 건수</span></div>
+        <div class="stat"><b>당일</b><span>조제 · 출고 원칙</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 4. 조제 프로세스 ================= -->
+  <section class="section gray" id="process">
+    <div class="wrap">
+      <div class="head-center">
+        <span class="sec-tag en">Process</span>
+        <h2 class="section-title">처방부터 배송까지, 6단계 조제 시스템</h2>
+        <p class="section-lead">모든 단계가 기록되고, 모든 기록이 남습니다.</p>
+      </div>
+      <div class="process-grid">
+        <div class="p-step"><h3>조제 의뢰</h3><p>팩스 · 온라인으로 처방전 접수</p></div>
+        <div class="p-step"><h3>처방 검토</h3><p>한약사의 처방 감사 및 확인</p></div>
+        <div class="p-step"><h3>약재 계량</h3><p>처방전 기준 정밀 계량 · 조제</p></div>
+        <div class="p-step"><h3>전탕 · 조제</h3><p>처방 의도에 맞는 전탕 조건 적용</p></div>
+        <div class="p-step"><h3>검수 · 포장</h3><p>최종 검수 후 위생 포장</p></div>
+        <div class="p-step"><h3>출고 · 배송</h3><p>당일 출고 · 전국 배송</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 5. 제형 안내 ================= -->
+  <section class="section black" id="forms">
+    <div class="wrap">
+      <div class="head-center">
+        <span class="sec-tag en">Dosage Forms</span>
+        <h2 class="section-title">처방에 맞는 다양한 제형</h2>
+        <p class="section-lead">환자의 복용 편의와 처방 목적에 맞추어 여러 제형으로 조제합니다.</p>
+      </div>
+      <div class="forms-grid">
+        <div class="f-card">
+          <span class="en">Decoction</span>
+          <h3>탕약</h3>
+          <p>가장 기본이 되는 제형. 처방별 맞춤 전탕 후 1회분 파우치로 포장합니다.</p>
+        </div>
+        <div class="f-card">
+          <span class="en">Pill</span>
+          <h3>환제</h3>
+          <p>휴대와 복용이 간편한 환 제형. 농축환 · 제환 방식으로 조제합니다.</p>
+        </div>
+        <div class="f-card">
+          <span class="en">Premium</span>
+          <h3>공진단 · 경옥고</h3>
+          <p>엄선한 원료로 정성껏 빚는 프리미엄 보약 라인입니다.</p>
+        </div>
+        <div class="f-card">
+          <span class="en">Soft Extract</span>
+          <h3>연조엑스 (스틱형)</h3>
+          <p>짜서 간편하게 복용하는 스틱형 제형. 어린이 · 휴대용으로 좋습니다.</p>
+        </div>
+        <div class="f-card">
+          <span class="en">Powder</span>
+          <h3>산제 (가루약)</h3>
+          <p>처방에 따라 곱게 분말화하여 소분 포장합니다.</p>
+        </div>
+        <div class="f-card">
+          <span class="en">External Use</span>
+          <h3>외용제</h3>
+          <p>스프레이 · 크림 등 피부에 사용하는 외용 제형을 조제합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 6. 품질 · 안전 ================= -->
+  <section class="section" id="quality">
+    <div class="wrap">
+      <div class="q-grid">
+        <div>
+          <span class="sec-tag en">Quality &amp; Safety</span>
+          <h2 class="section-title">눈에 보이지 않는 안전까지<br />검사로 증명합니다</h2>
+          <p class="section-lead">
+            좋은 약재를 고르는 것에서 멈추지 않습니다.
+            입고부터 출고까지 각 단계의 안전성 검사와 위생 관리 절차를 운영하고,
+            모든 결과를 기록으로 남깁니다.
+          </p>
+        </div>
+        <div class="q-items">
+          <div class="q-item">
+            <span class="no en">01</span>
+            <div>
+              <h3>잔류농약 · 중금속 검사</h3>
+              <p>규격 한약재 성적서 확인 및 자체 검수 절차 운영</p>
+            </div>
+          </div>
+          <div class="q-item">
+            <span class="no en">02</span>
+            <div>
+              <h3>미생물 · 위생 관리</h3>
+              <p>조제 구역 분리, 정기 소독, 작업자 위생 기준 준수</p>
+            </div>
+          </div>
+          <div class="q-item">
+            <span class="no en">03</span>
+            <div>
+              <h3>전 과정 기록 관리</h3>
+              <p>입고 · 조제 · 출고 이력을 문서화하여 추적 가능</p>
+            </div>
+          </div>
+          <div class="q-item">
+            <span class="no en">04</span>
+            <div>
+              <h3>인증 · 신고 현황</h3>
+              <p>보건복지부 신고 원외탕전실 (인증 배지 자리)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 7. 공지 + 문의 ================= -->
+  <section class="section gray" id="news">
+    <div class="wrap nc-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <h3>공지사항</h3>
+          <a href="#">전체보기 +</a>
+        </div>
+        <ul class="notice-list">
+          <li><a href="#"><span>풀뿌리원외탕전실 홈페이지가 새롭게 문을 열었습니다</span><time>2026.08.08</time></a></li>
+          <li><a href="#"><span>추석 연휴 조제 · 배송 일정 안내</span><time>2026.08.01</time></a></li>
+          <li><a href="#"><span>여름철 탕약 보관 방법 안내</span><time>2026.07.15</time></a></li>
+          <li><a href="#"><span>신규 제휴 한의원 대상 조제 안내자료 배포</span><time>2026.07.02</time></a></li>
+          <li><a href="#"><span>조제 의뢰서 양식 개정 안내 (v2.0)</span><time>2026.06.20</time></a></li>
+        </ul>
+      </div>
+      <div class="panel contact-panel" id="contact">
+        <h3>조제 의뢰 · 제휴 문의</h3>
+        <p>한의원 · 한방병원 원장님들의<br />조제 의뢰와 제휴 상담을 기다립니다.</p>
+        <div class="tel">031-877-3988</div>
+        <div class="hours">평일 09:00–18:00 · 토요일 09:00–13:00</div>
+        <div class="btns">
+          <a href="#">팩스 조제 의뢰 안내</a>
+          <a href="#">카카오톡 채널 상담</a>
+          <a href="#">조제 의뢰서 다운로드</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 8. 오시는 길 ================= -->
+  <section class="section" id="location">
+    <div class="wrap loc-grid">
+      <div class="map-ph">지도 자리 (카카오맵 연동 예정)</div>
+      <div class="loc-info">
+        <span class="sec-tag en">Location</span>
+        <h2 class="section-title">오시는 길</h2>
+        <dl>
+          <dt>주소</dt><dd>경기도 의정부시 신흥로239번길 39-17, 1층</dd>
+          <dt>전화</dt><dd>031-877-3988</dd>
+          <dt>팩스</dt><dd>000-0000-0000 (확인 후 기입)</dd>
+          <dt>이메일</dt><dd>hello@pulppuri.co.kr (확인 후 기입)</dd>
+          <dt>운영시간</dt><dd>평일 09:00–18:00 · 토요일 09:00–13:00 (일 · 공휴일 휴무)</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 9. FOOTER ================= -->
+  <footer>
+    <div class="wrap">
+      <div class="foot-top">
+        <div class="foot-logo">
+          <b>풀뿌리원외탕전실</b>
+          <span>PULPPURI HERBAL DISPENSARY</span>
+        </div>
+        <div class="foot-links">
+          <a href="#">개인정보처리방침</a>
+          <a href="#">이용약관</a>
+          <a href="#news">공지사항</a>
+          <a href="#location">오시는 길</a>
+        </div>
+      </div>
+      <div class="foot-info">
+        상호 : 풀뿌리원외탕전실 &nbsp;|&nbsp; 대표 : ○○○ &nbsp;|&nbsp; 사업자등록번호 : 000-00-00000<br />
+        주소 : 경기도 의정부시 신흥로239번길 39-17, 1층 &nbsp;|&nbsp; 전화 : 031-877-3988
+        <div class="copy">© 2026 Pulppuri Herbal Dispensary. All rights reserved.</div>
       </div>
     </div>
   </footer>
 
-  <!-- ================= 플로팅 상담바 (모바일) ================= -->
-  <div class="fab" data-lp-group="fab" data-lp-label="플로팅 상담바">
-    <a href="tel:0000000000" class="call" data-lp="fab-call" data-lp-label="전화 버튼">전화 상담</a>
-    <a href="https://pf.kakao.com/" class="kakao" data-lp="fab-kakao" data-lp-label="카카오 버튼">카카오톡 상담</a>
-  </div>
-
-  <script src="js/lp-runtime.js"></script>
-  <script>
-    // Header hairline on scroll
-    const header = document.getElementById('header');
-    const onScroll = () => header.classList.toggle('solid', window.scrollY > 10);
-    onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
-
-    // Reveal on scroll (IO 미지원/오류 시 전체 표시)
-    if ('IntersectionObserver' in window) {
-      document.documentElement.classList.add('js');
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-      }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
-      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-    }
-  </script>
 </body>
 </html>
